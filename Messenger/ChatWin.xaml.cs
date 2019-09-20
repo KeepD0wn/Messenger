@@ -45,6 +45,7 @@ namespace Messenger
                     {
                         data.Add(new string[1]);
                         data[data.Count - 1][0] = reader[2].ToString();
+                       // data[data.Count - 1][1] = reader[2].ToString();
                     }
                     reader.Close();
                 }
@@ -69,7 +70,7 @@ namespace Messenger
         
         private void TxtPost_Click(object sender, RoutedEventArgs e)
         {
-            string sql = string.Format($"Insert into MessengerMessege (MessegeUserID,MessegeText,MessegeDate) values ({User.Id},'{UserTxt.Text}',GETDATE())");
+            string sql = string.Format($"Insert into MessengerMessege (MessegeUserName,MessegeText,MessegeDate) values ('{User.Login}','{UserTxt.Text}',GETDATE())");
             using (SqlCommand cmd = new SqlCommand(sql, main.Connect))
             {                
                     cmd.ExecuteNonQuery();     
