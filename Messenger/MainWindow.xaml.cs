@@ -21,31 +21,56 @@ namespace Messenger
     /// </summary>
     public partial class MainWindow : Window
     {
-       
         private SqlConnection connect = null;
         public MainWindow()
         {
             InitializeComponent();
             connect = new SqlConnection("Server=31.31.196.89; Database=u0805163_2iq; User Id=u0805163_user1; Password=1337Elit72;");
-            Connect.Open();           
+            Connect.Open();
         }
 
-        public SqlConnection Connect { get { return connect; }}
+        public SqlConnection Connect { get { return connect; } }
 
         private void Button_Click(object sender, RoutedEventArgs e)
-        {         
-            if(Logintb.Text=="test" && Passwtb.Text == "12345")
+        {           
+            SqlCommand sql = new SqlCommand($"select * from MessengerUsers where UserName = '{Logintb.Text}'", Connect);
+            using (SqlDataReader reader = sql.ExecuteReader())
             {
-                ChatWin cw = new ChatWin();
-                cw.Show();
-                this.Close();
+                int viewed = 0;   //если 0, то пользователя с таким логином нет и ридер не запустится, если 1, то есть             
+                while (reader.Read())
+                {
+                    viewed += 1;
+                    if (Passwtb.Text == reader[2].ToString())
+                    {
+                        Console.WriteLine("Заходим на сайт");
+                       User user = new User
+                        (
+                            Convert.ToInt32(reader[0]),
+                          reader[1].ToString(),
+                          reader[2].ToString()
+                        );
+                        ChatWin cw = new ChatWin();
+                        this.Close();
+                        cw.Show();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Неправильный логин или пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Logintb.Text = string.Empty;
+                        Passwtb.Text = string.Empty;
+                        return;
+                    }
+                    
+                }
+                if (viewed == 0)
+                {
+                    MessageBox.Show("Неправильный логин или пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Logintb.Text = string.Empty;
+                    Passwtb.Text = string.Empty;
+                    return;
+                }
             }
-            else
-            {
-                Logintb.Text = string.Empty;
-                Passwtb.Text = string.Empty;
-            }
-        }
 
+        }
     }
 }

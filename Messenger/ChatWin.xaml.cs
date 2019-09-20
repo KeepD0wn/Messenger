@@ -34,8 +34,7 @@ namespace Messenger
         public void UpdateTable() 
         {
             while (true)
-            {
-                ClearTable();
+            {                
                 string qu = "select * from MessengerMessege";
                 data.Clear();
                 using (SqlCommand com = new SqlCommand(qu, main.Connect))
@@ -47,13 +46,15 @@ namespace Messenger
                         data.Add(new string[1]);
                         data[data.Count - 1][0] = reader[2].ToString();
                     }
+                    reader.Close();
+                }
 
+                    ClearTable();
                     foreach (string[] s in data)
                     {
                         Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Add(s[0]); }));                       
-                    }
-                    reader.Close();
-                }
+                    }                    
+                
                 Thread.Sleep(500);
             }
         }
