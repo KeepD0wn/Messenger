@@ -8,7 +8,7 @@ namespace Messenger
 {
     class User
     {
-        public int Id { get; set; }
+        public static int Id { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
 

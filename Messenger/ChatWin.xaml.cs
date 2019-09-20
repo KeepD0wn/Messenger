@@ -49,11 +49,11 @@ namespace Messenger
                     reader.Close();
                 }
 
-                    ClearTable();
-                    foreach (string[] s in data)
-                    {
-                        Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Add(s[0]); }));                       
-                    }                    
+                ClearTable();
+                foreach (string[] s in data)
+                {
+                    Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Add(s[0]); }));                       
+                }                    
                 
                 Thread.Sleep(500);
             }
@@ -66,15 +66,14 @@ namespace Messenger
                 Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Clear(); }));
             }
         }
-
+        
         private void TxtPost_Click(object sender, RoutedEventArgs e)
         {
-            string sql = string.Format($"Insert into MessengerMessege (MessegeUserID,MessegeText,MessegeDate) values (1,'{UserTxt.Text}',GETDATE())");
+            string sql = string.Format($"Insert into MessengerMessege (MessegeUserID,MessegeText,MessegeDate) values ({User.Id},'{UserTxt.Text}',GETDATE())");
             using (SqlCommand cmd = new SqlCommand(sql, main.Connect))
             {                
                     cmd.ExecuteNonQuery();     
             }
-
             UserTxt.Text = string.Empty;
         }               
     }
