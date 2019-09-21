@@ -12,6 +12,7 @@
         <Label Content="Логин" HorizontalAlignment="Left" Margin="99,168,0,0" VerticalAlignment="Top" Height="43" Width="171" FontSize="22"/>
         <TextBox Name="Logintb" HorizontalAlignment="Left" Height="42" Margin="338,168,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280" FontSize="22" Background="#FFA2A2A2"/>
         <Label Content="Пароль" HorizontalAlignment="Left" Margin="99,252,0,0" VerticalAlignment="Top" Height="43" Width="171" FontSize="22" Background="White"/>
-        <Button Content="Войти" HorizontalAlignment="Left" Margin="301,332,0,0" VerticalAlignment="Top" Width="200" Height="65" FontSize="48" Background="#FF9E88FF" Click="Button_Click"/>
+        <Button Content="Войти" HorizontalAlignment="Left" Margin="200,325,0,0" VerticalAlignment="Top" Width="200" Height="66" FontSize="48" Background="#FF9E88FF" Click="Button_Click"/>
+        <Button Content="Регистрация" HorizontalAlignment="Left" Margin="444,325,0,0" VerticalAlignment="Top" Width="288" Height="66" FontSize="48" Background="#FF9E88FF" Click="Button_Click_1"/>
     </Grid>
 </Window>

@@ -43,9 +43,9 @@ namespace Messenger
 
                     while (reader.Read())
                     {
-                        data.Add(new string[1]);
-                        data[data.Count - 1][0] = reader[2].ToString();
-                       // data[data.Count - 1][1] = reader[2].ToString();
+                        data.Add(new string[2]);
+                        data[data.Count - 1][0] = reader[1].ToString();
+                        data[data.Count - 1][1] = reader[2].ToString();
                     }
                     reader.Close();
                 }
@@ -53,7 +53,7 @@ namespace Messenger
                 ClearTable();
                 foreach (string[] s in data)
                 {
-                    Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Add(s[0]); }));                       
+                    Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Add(s[0]+":  "+s[1]); }));                       
                 }                    
                 
                 Thread.Sleep(500);

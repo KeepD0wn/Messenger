@@ -77,5 +77,12 @@ namespace Messenger
             Logintb.Text = string.Empty;
             Passwtb.Text = string.Empty;
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Registr reg = new Registr();
+            reg.Owner = this;
+            reg.Show();
+        }               
     }
 }
