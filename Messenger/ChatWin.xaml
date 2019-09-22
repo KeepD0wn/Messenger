@@ -6,12 +6,11 @@
         xmlns:local="clr-namespace:Messenger"
         mc:Ignorable="d"
         Title="ChatWin" Height="450" Width="800">
-    <Grid>
+    <Grid>        
         <ListBox Name="lb" SelectionMode="Single" Margin="61,10,61,180">
-
         </ListBox>
-        <TextBox Name="UserTxt" HorizontalAlignment="Left" Height="102" Margin="61,278,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="352"/>
-        <Button Name="TxtPost" Content="Отправить" HorizontalAlignment="Left" Margin="452,324,0,0" VerticalAlignment="Top" Width="161" Height="56" Click="TxtPost_Click"/>
+        <TextBox Name="UserTxt" HorizontalAlignment="Left" MinHeight="102" Margin="61,0,0,39" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" MinWidth="352" KeyDown="UserTxt_KeyDown"/>
+        <Button Name="TxtPost" Content="Отправить" HorizontalAlignment="Left" Margin="452,0,0,39" VerticalAlignment="Bottom" MinWidth="161" MinHeight="56" Click="TxtPost_Click"/>
     </Grid>
 
 </Window>

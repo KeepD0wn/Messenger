@@ -26,9 +26,8 @@ namespace Messenger
         public MainWindow()
         {
             InitializeComponent();
-            connect = new SqlConnection("Server=31.31.196.89; Database=u0805163_2iq; User Id=u0805163_user1; Password=1337Elit72;");
-            Connect.Open();
-            
+            connect = new SqlConnection("Server=31.31.196.89; Database=u0805163_2iq; User Id=u0805163_user1; Password=!123qwe;");
+            Connect.Open();            
         }       
 
         public SqlConnection Connect { get { return connect; } }
