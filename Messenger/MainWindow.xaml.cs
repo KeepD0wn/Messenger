@@ -26,7 +26,7 @@ namespace Messenger
         public MainWindow()
         {
             InitializeComponent();
-            connect = new SqlConnection("Server=31.31.196.89; Database=u0805163_2iq; User Id=u0805163_user1; Password=!123qwe;");
+            connect = new SqlConnection("Server=31.31.196.89; Database=u0805163_2iq; User Id=u0805163_user1; Password=!123qwe; MultipleActiveResultSets=True;");
             Connect.Open();            
         }       
 
@@ -82,6 +82,22 @@ namespace Messenger
             Registr reg = new Registr();
             reg.Owner = this;
             reg.Show();
-        }               
+        }
+
+        private void Logintb_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Button_Click(sender, e);
+            }
+        }
+
+        private void Passwtb_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Button_Click(sender, e);
+            }
+        }
     }
 }

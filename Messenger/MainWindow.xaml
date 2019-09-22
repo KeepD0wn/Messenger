@@ -7,10 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <TextBox Name="Passwtb" HorizontalAlignment="Left" Height="43" Margin="338,252,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280" FontSize="22" Background="#FFA2A2A2"/>
+        <TextBox Name="Passwtb" HorizontalAlignment="Left" Height="43" Margin="338,252,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280" FontSize="22" Background="#FFA2A2A2" KeyDown="Passwtb_KeyDown"/>
         <Label Content="Вход" HorizontalAlignment="Left" Margin="338,10,0,0" VerticalAlignment="Top" Height="96" Width="251" FontSize="72" FontWeight="Bold"/>
         <Label Content="Логин" HorizontalAlignment="Left" Margin="99,168,0,0" VerticalAlignment="Top" Height="43" Width="171" FontSize="22"/>
-        <TextBox Name="Logintb" HorizontalAlignment="Left" Height="42" Margin="338,168,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280" FontSize="22" Background="#FFA2A2A2"/>
+        <TextBox Name="Logintb" HorizontalAlignment="Left" Height="42" Margin="338,168,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280" FontSize="22" Background="#FFA2A2A2" KeyDown="Logintb_KeyDown"/>
         <Label Content="Пароль" HorizontalAlignment="Left" Margin="99,252,0,0" VerticalAlignment="Top" Height="43" Width="171" FontSize="22" Background="White"/>
         <Button Content="Войти" HorizontalAlignment="Left" Margin="200,325,0,0" VerticalAlignment="Top" Width="200" Height="66" FontSize="48" Background="#FF9E88FF" Click="Button_Click"/>
         <Button Content="Регистрация" HorizontalAlignment="Left" Margin="444,325,0,0" VerticalAlignment="Top" Width="288" Height="66" FontSize="48" Background="#FF9E88FF" Click="Button_Click_1"/>

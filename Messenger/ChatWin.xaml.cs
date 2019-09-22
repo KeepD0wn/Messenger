@@ -23,6 +23,7 @@ namespace Messenger
     {       
         public List<string[]> data = new List<string[]>();
         MainWindow main = new MainWindow();
+        int x = 0;
 
         public ChatWin()
         {
@@ -32,8 +33,7 @@ namespace Messenger
         }        
 
         public void UpdateTable() 
-        {
-            int x = 0;
+        {            
             while (true)
             {                
                 string qu = "select * from MessengerMessege";
@@ -57,10 +57,11 @@ namespace Messenger
                     Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Add(s[0]+":  "+s[1]); }));                       
                 }
 
-                x = +1;
+                x += 1;
                 if (x == 1)
                 {
                     Dispatcher.BeginInvoke(new ThreadStart(delegate { ScrollDown();}));
+                    Console.WriteLine("f");
                 }
                 Thread.Sleep(500);
             }
@@ -80,25 +81,26 @@ namespace Messenger
             {
                 try
                 {
-                    string sql = string.Format($"Insert into MessengerMessege (MessegeUserName,MessegeText,MessegeDate) values ('{User.Login}','{UserTxt.Text}',GETDATE())");
+                    string sql = string.Format($"Insert into MessengerMessege (MessegeUserName,MessegeText,MessegeDate) values ('{User.Login}','{UserTxt.Text}',GETDATE());");
                     using (SqlCommand cmd = new SqlCommand(sql, main.Connect))
                     {
                         cmd.ExecuteNonQuery();
                     }
                     UserTxt.Text = string.Empty;
+                    ScrollDown();
                 }
-                catch
+                catch (System.InvalidOperationException)
                 {
-                    MessageBox.Show("Ой-ой-ой, что-то пошло не так", "Ой-ой-ой", MessageBoxButton.OK, MessageBoxImage.None);
-                }
-                ScrollDown();
+                    MessageBox.Show("Это была ошибка, но я её поймал. Йухууу", "Йухууу", MessageBoxButton.OK, MessageBoxImage.None);
+                }                    
             }            
         }
 
         public void ScrollDown() //мотаем вниз
         {
             if (lb.Items.Count != 0)
-                lb.ScrollIntoView(lb.Items[lb.Items.Count - 1]);
+                scrollTxt.ScrollToEnd();
+            // lb.ScrollIntoView(lb.Items[lb.Items.Count - 1]);
         }
 
         private void UserTxt_KeyDown(object sender, KeyEventArgs e)
