@@ -60,7 +60,7 @@ namespace Messenger
                 x = +1;
                 if (x == 1)
                 {
-                    Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.ScrollIntoView(lb.Items[lb.Items.Count - 1]); }));
+                    Dispatcher.BeginInvoke(new ThreadStart(delegate { ScrollDown();}));
                 }
                 Thread.Sleep(500);
             }
@@ -90,9 +90,15 @@ namespace Messenger
                 catch
                 {
                     MessageBox.Show("Ой-ой-ой, что-то пошло не так", "Ой-ой-ой", MessageBoxButton.OK, MessageBoxImage.None);
-                }                
-                lb.ScrollIntoView(lb.Items[lb.Items.Count-1]); //мотаем вниз
+                }
+                ScrollDown();
             }            
+        }
+
+        public void ScrollDown() //мотаем вниз
+        {
+            if (lb.Items.Count != 0)
+                lb.ScrollIntoView(lb.Items[lb.Items.Count - 1]);
         }
 
         private void UserTxt_KeyDown(object sender, KeyEventArgs e)
