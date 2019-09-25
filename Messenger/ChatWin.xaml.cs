@@ -61,7 +61,6 @@ namespace Messenger
                 if (x == 1)
                 {
                     Dispatcher.BeginInvoke(new ThreadStart(delegate { ScrollDown();}));
-                    Console.WriteLine("f");
                 }
                 Thread.Sleep(500);
             }
@@ -70,7 +69,7 @@ namespace Messenger
         public void ClearTable()
         {
             foreach (string[] s in data)
-            {                
+            {                                
                 Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Clear(); }));
             }
         }

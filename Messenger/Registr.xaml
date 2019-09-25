@@ -6,13 +6,13 @@
         xmlns:local="clr-namespace:Messenger"
         mc:Ignorable="d"
         Title="Registr" Height="450" Width="800">
-    <Grid>
+    <Grid OpacityMask="White" Background="#FFBBE6FF">
         <Label Content="Регистрация" HorizontalAlignment="Left" Margin="323,38,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.449,0.442" Height="63" Width="236" FontSize="36"/>
         <Label Content="Логин" HorizontalAlignment="Left" Margin="193,170,0,0" VerticalAlignment="Top" Height="44" Width="125" FontSize="24"/>
-        <TextBox Name="RLog" HorizontalAlignment="Left" Height="44" Margin="323,170,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="238"  FontSize="22" KeyDown="RLog_KeyDown"/>
+        <TextBox Name="RLog" HorizontalAlignment="Left" Height="44" Margin="323,170,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="238"  FontSize="22" KeyDown="RLog_KeyDown" Background="#7F9E9E9E"/>
         <Label Content="Пароль" HorizontalAlignment="Left" Margin="193,250,0,0" VerticalAlignment="Top" Height="44" Width="125" FontSize="24"/>
-        <TextBox Name="RPas" HorizontalAlignment="Left" Height="44" Margin="323,250,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="238" FontSize="22" KeyDown="RPas_KeyDown"/>
-        <Button Content="Зарегестрироваться" HorizontalAlignment="Left" Margin="323,344,0,0" VerticalAlignment="Top" Width="256" Height="44" Click="Button_Click" FontSize="24"/>
+        <TextBox Name="RPas" HorizontalAlignment="Left" Height="44" Margin="323,250,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="238" FontSize="22" KeyDown="RPas_KeyDown" Background="#7F9E9E9E"/>
+        <Button Content="Зарегестрироваться" HorizontalAlignment="Left" Margin="323,344,0,0" VerticalAlignment="Top" Width="256" Height="44" Click="Button_Click" FontSize="24" Background="#4C0000FF"/>
 
     </Grid>
 </Window>
