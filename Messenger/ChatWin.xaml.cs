@@ -99,7 +99,7 @@ namespace Messenger
         public void ScrollDown() //мотаем вниз
         {
             if (lb.Items.Count != 0)
-                scrollTxt.ScrollToEnd();
+                scrollTxt.ScrollToBottom();
             // lb.ScrollIntoView(lb.Items[lb.Items.Count - 1]);
         }
 
