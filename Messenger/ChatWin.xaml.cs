@@ -53,14 +53,18 @@ namespace Messenger
 
                 ClearTable();
                 foreach (string[] s in data)
-                {
-                    Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Add(s[0]+":  "+s[1]); }));                       
+                {                                        
+                    Dispatcher.BeginInvoke(new ThreadStart(delegate
+                    { TextBlock newBlock = new TextBlock();
+                      newBlock.Text = s[0] + ":  " + s[1];
+                      lb.Children.Add(newBlock);
+                    }));                       
                 }
-
-                x += 1;
-                if (x == 1)
+                
+                if (x == 0)
                 {
                     Dispatcher.BeginInvoke(new ThreadStart(delegate { ScrollDown();}));
+                    x += 1;
                 }
                 Thread.Sleep(500);
             }
@@ -70,7 +74,7 @@ namespace Messenger
         {
             foreach (string[] s in data)
             {                                
-                Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Items.Clear(); }));
+                Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Children.Clear(); }));
             }
         }
         
@@ -97,9 +101,8 @@ namespace Messenger
 
         public void ScrollDown() //мотаем вниз
         {
-            if (lb.Items.Count != 0)
-                scrollTxt.ScrollToBottom();
-            // lb.ScrollIntoView(lb.Items[lb.Items.Count - 1]);
+            if (lb.Children.Count != 0)
+                scroll.ScrollToEnd();
         }
 
         private void UserTxt_KeyDown(object sender, KeyEventArgs e)
