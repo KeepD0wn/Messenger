@@ -32,12 +32,12 @@ namespace Messenger
             {
                 if (RLog.Text != "" && RPas.Text != "")
                 {
-                    string qu = $"Insert into MessengerUsers (UserName,UserPassword) values ('{RLog.Text}','{RPas.Text}');";
+                    string qu = "Insert into MessengerUsers (UserName,UserPassword) values (@log,@pas);";
                     using (SqlCommand com = new SqlCommand(qu, main.Connect))
                     {
-
+                        com.Parameters.AddWithValue("@log", RLog.Text);
+                        com.Parameters.AddWithValue("@pas",RPas.Text);
                         com.ExecuteNonQuery();
-
                     }
                     MessageBox.Show("Регистрация успешно подтверждена", "Подтверждение", MessageBoxButton.OK, MessageBoxImage.None);
                     RLog.Text = string.Empty;

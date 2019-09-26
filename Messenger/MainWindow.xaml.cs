@@ -34,10 +34,11 @@ namespace Messenger
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {           
-            SqlCommand sql = new SqlCommand($"select * from MessengerUsers where UserName = '{Logintb.Text}'", Connect);
+            SqlCommand sql = new SqlCommand("select * from MessengerUsers where UserName = @txt", Connect);
+            sql.Parameters.AddWithValue("@txt", Logintb.Text);
 
             using (SqlDataReader reader = sql.ExecuteReader())
-            {
+            {                
                 int viewed = 0;   //если 0, то пользователя с таким логином нет и ридер не запустится, если 1, то есть             
                 while (reader.Read())
                 {

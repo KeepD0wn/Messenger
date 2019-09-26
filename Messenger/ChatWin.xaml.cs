@@ -81,21 +81,16 @@ namespace Messenger
         private void TxtPost_Click(object sender, RoutedEventArgs e)
         {            
             if (UserTxt.Text.Trim()!=string.Empty)
-            {
-                try
-                {
-                    string sql = string.Format($"Insert into MessengerMessege (MessegeUserName,MessegeText,MessegeDate) values ('{User.Login}','{UserTxt.Text}',GETDATE());");
+            {               
+                    string sql = string.Format("Insert into MessengerMessege (MessegeUserName,MessegeText,MessegeDate) values (@login , @txt , GETDATE());");
                     using (SqlCommand cmd = new SqlCommand(sql, main.Connect))
                     {
+                        cmd.Parameters.AddWithValue("@login",User.Login);
+                        cmd.Parameters.AddWithValue("@txt",UserTxt.Text);
                         cmd.ExecuteNonQuery();
                     }
                     UserTxt.Text = string.Empty;
                     ScrollDown();
-                }
-                catch (System.InvalidOperationException)
-                {
-                    MessageBox.Show("Это была ошибка, но я её поймал. Йухууу", "Йухууу", MessageBoxButton.OK, MessageBoxImage.None);
-                }                    
             }            
         }
 
