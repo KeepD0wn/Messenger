@@ -7,14 +7,16 @@
         mc:Ignorable="d"
         Title="ChatWin" Height="450" Width="800">
     <Grid Background="#FFBBE6FF">
-        <ScrollViewer Name="scroll" VerticalScrollBarVisibility="Visible" Margin="10,24,10,158">
+        <ScrollViewer Name="scroll"  VerticalScrollBarVisibility="Visible" Margin="10,24,0,158">
             <StackPanel Name="lb"  Background="#7F9E9E9E">
-
             </StackPanel>
         </ScrollViewer>
 
-
-        <TextBox Name="UserTxt" HorizontalAlignment="Left" Height="102" Margin="61,0,0,39" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Width="352" KeyDown="UserTxt_KeyDown" Background="#7F9E9E9E"/>
+            <TextBox Name="UserTxt" HorizontalAlignment="Left" Height="100" Margin="10,0,0,39" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom"  KeyDown="UserTxt_KeyDown"  Width="400" TextChanged="UserTxt_TextChanged">
+            <TextBox.Background>
+                <ImageBrush ImageSource="Resources/Writt.png" AlignmentX="Left" AlignmentY="Top" Stretch="None"/>
+            </TextBox.Background>
+            </TextBox>
         <Button Name="TxtPost" Content="Отправить" HorizontalAlignment="Left" Margin="452,0,0,39" VerticalAlignment="Bottom" MinWidth="161" MinHeight="56" Click="TxtPost_Click" Background="#4C0000FF"/>
     </Grid>
 

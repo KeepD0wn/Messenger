@@ -107,5 +107,28 @@ namespace Messenger
                 TxtPost_Click(sender, e);
             }            
         }
+
+        private void UserTxt_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (UserTxt.Text == "")
+            {
+                // Create an ImageBrush.
+                ImageBrush textImageBrush = new ImageBrush();
+                textImageBrush.ImageSource =
+                    new BitmapImage(
+                        new Uri("Resources/Writt.png", UriKind.Relative)
+                    );
+                textImageBrush.AlignmentX = AlignmentX.Left;
+                textImageBrush.AlignmentY = AlignmentY.Top;
+                textImageBrush.Stretch = Stretch.None;
+                // Use the brush to paint the button's background.
+                UserTxt.Background = textImageBrush;
+
+            }
+            else
+            {
+                UserTxt.Background = null;
+            }
+        }
     }
 }
