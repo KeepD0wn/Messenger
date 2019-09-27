@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Messenger"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid Background="#FFBBE6FF">
-        <TextBox Name="Passwtb" HorizontalAlignment="Center" Height="43" Margin="338,252,174,124" TextWrapping="Wrap" VerticalAlignment="Center" Width="280" FontSize="22" Background="#7F9E9E9E" KeyDown="Passwtb_KeyDown"/>
+        Title="MainWindow" Height="500" Width="850" ResizeMode="CanMinimize">
+    <Grid  Background="#FFBBE6FF" >
+        <TextBox Name="Passwtb" HorizontalAlignment="Center" Height="43" Margin="300,252,174,124" TextWrapping="NoWrap" VerticalAlignment="Center" Width="318" FontSize="22" Background="#7F9E9E9E" KeyDown="Passwtb_KeyDown"/>
         <Label Content="Вход" HorizontalAlignment="Center" Margin="300,32,241,291" VerticalAlignment="Center" Height="96" Width="251" FontSize="72" FontWeight="Bold"/>
         <Label Content="Логин" HorizontalAlignment="Center" Margin="200,167,464,209" VerticalAlignment="Center" Height="43" Width="128" FontSize="22"/>
-        <TextBox Name="Logintb" VerticalAlignment="Center" HorizontalAlignment="Center" Height="42" Margin="338,168,174,209" TextWrapping="Wrap" Width="280" FontSize="22" Background="#7F9E9E9E" KeyDown="Logintb_KeyDown"/>
+        <TextBox Name="Logintb" VerticalAlignment="Center" HorizontalAlignment="Center" Height="42" Margin="300,168,174,209" TextWrapping="NoWrap" Width="318" FontSize="22" Background="#7F9E9E9E" KeyDown="Logintb_KeyDown"/>
         <Label Content="Пароль" HorizontalAlignment="Center" Margin="200,252,464,124" VerticalAlignment="Center" Height="43" Width="128" FontSize="22" Background="Transparent"/>
         <Button Content="Войти" HorizontalAlignment="Center" Margin="478,327,174,26" VerticalAlignment="Center" Width="140" Height="66" FontSize="36" Background="#4C0000FF" Click="Button_Click"/>
         <Button Content="Регистрация" HorizontalAlignment="Center" Margin="200,327,356,26" VerticalAlignment="Center" Width="236" Height="66" FontSize="36" Background="#4C0000FF" Click="Button_Click_1"/>

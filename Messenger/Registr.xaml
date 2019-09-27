@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Messenger"
         mc:Ignorable="d"
-        Title="Registr" Height="450" Width="800">
+        Title="Registr" Height="500" Width="850" ResizeMode="CanMinimize">
     <Grid OpacityMask="White" Background="#FFBBE6FF">
         <Label Content="Регистрация" HorizontalAlignment="Center" Margin="264,50,236,294" VerticalAlignment="Center" RenderTransformOrigin="0.449,0.442" Height="75" Width="292" FontSize="48"/>
         <Label Content="Логин" HorizontalAlignment="Center" Margin="193,170,474,205" VerticalAlignment="Center" Height="44" Width="125" FontSize="24"/>

@@ -107,12 +107,11 @@ namespace Messenger
                 TxtPost_Click(sender, e);
             }            
         }
-
-        private void UserTxt_TextChanged(object sender, TextChangedEventArgs e)
+        
+        private void UserTxt_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (UserTxt.Text == "")
+            if (UserTxt.Text == string.Empty)
             {
-                // Create an ImageBrush.
                 ImageBrush textImageBrush = new ImageBrush();
                 textImageBrush.ImageSource =
                     new BitmapImage(
@@ -121,14 +120,13 @@ namespace Messenger
                 textImageBrush.AlignmentX = AlignmentX.Left;
                 textImageBrush.AlignmentY = AlignmentY.Top;
                 textImageBrush.Stretch = Stretch.None;
-                // Use the brush to paint the button's background.
                 UserTxt.Background = textImageBrush;
+            }
+        }
 
-            }
-            else
-            {
-                UserTxt.Background = null;
-            }
+        private void UserTxt_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UserTxt.Background = null;
         }
     }
 }
