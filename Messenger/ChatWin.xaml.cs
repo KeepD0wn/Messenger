@@ -132,6 +132,7 @@ namespace Messenger
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            MicButton.Background = Brushes.DarkSlateGray;
             System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("ru-ru");
             SpeechRecognitionEngine speech = new SpeechRecognitionEngine(culture);
             speech.SetInputToDefaultAudioDevice();
@@ -154,7 +155,7 @@ namespace Messenger
         {
             if (e.Result.Confidence > 0.7)
             {
-                this.Close();
+                Environment.Exit(0);
             }
         }
     }
