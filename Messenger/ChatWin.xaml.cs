@@ -36,7 +36,7 @@ namespace Messenger
         public void UpdateTable() 
         {            
             while (true)
-            {                
+            {                //замутить оптимизейшн
                 string qu = "select * from MessengerMessege";  
                 data.Clear();
                 using (SqlCommand com = new SqlCommand(qu, main.Connect))
@@ -111,6 +111,16 @@ namespace Messenger
         
         private void UserTxt_LostFocus(object sender, RoutedEventArgs e)
         {
+            SetPicture();
+        }
+
+        private void UserTxt_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UserTxt.Background = null;
+        }
+
+        void SetPicture()
+        {
             if (UserTxt.Text == string.Empty)
             {
                 ImageBrush textImageBrush = new ImageBrush();
@@ -123,11 +133,6 @@ namespace Messenger
                 textImageBrush.Stretch = Stretch.None;
                 UserTxt.Background = textImageBrush;
             }
-        }
-
-        private void UserTxt_GotFocus(object sender, RoutedEventArgs e)
-        {
-            UserTxt.Background = null;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -153,7 +158,7 @@ namespace Messenger
 
         void OnSpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result.Confidence > 0.7)
+            if (e.Result.Confidence > 0.6)
             {
                 Environment.Exit(0);
             }

@@ -22,7 +22,7 @@ namespace Messenger
     public partial class MainWindow : Window
     {
         private SqlConnection connect = null;
-        User user = new User(); // сделать доступ из других классов
+        User user; // сделать доступ из других классов
         public MainWindow()
         {
             InitializeComponent();
