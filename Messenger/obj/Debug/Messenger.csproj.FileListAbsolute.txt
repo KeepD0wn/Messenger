@@ -17,3 +17,5 @@ C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\ChatWin.g.cs
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\ChatWin.baml
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Registr.g.cs
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Registr.baml
+C:\Users\gvozd\source\repos\Messenger\Messenger\bin\Debug\Microsoft.Speech.dll
+C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Messenger.csproj.CopyComplete

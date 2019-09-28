@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Data.SqlClient;
 using System.Threading;
+using Microsoft.Speech.Recognition;
 
 namespace Messenger
 {
@@ -127,6 +128,34 @@ namespace Messenger
         private void UserTxt_GotFocus(object sender, RoutedEventArgs e)
         {
             UserTxt.Background = null;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("ru-ru");
+            SpeechRecognitionEngine speech = new SpeechRecognitionEngine(culture);
+            speech.SetInputToDefaultAudioDevice();
+
+            speech.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(OnSpeechRecognized);
+
+            Choices num = new Choices();
+            num.Add(new string[] { "закрой приложение" });
+
+            GrammarBuilder grammarBuilder = new GrammarBuilder();
+            grammarBuilder.Append(num);
+
+            Grammar grammar = new Grammar(grammarBuilder);
+            speech.LoadGrammar(grammar);
+
+            speech.RecognizeAsync(RecognizeMode.Single);
+        }
+
+        void OnSpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            if (e.Result.Confidence > 0.7)
+            {
+                this.Close();
+            }
         }
     }
 }

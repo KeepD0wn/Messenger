@@ -12,12 +12,17 @@
             </StackPanel>
         </ScrollViewer>
 
-            <TextBox Name="UserTxt" HorizontalAlignment="Left" Height="100" Margin="10,0,0,39" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom"  KeyDown="UserTxt_KeyDown"  Width="400" OpacityMask="Black" Foreground="Black" LostFocus="UserTxt_LostFocus" GotFocus="UserTxt_GotFocus">
+        <TextBox Name="UserTxt" HorizontalAlignment="Left" Height="100" Margin="10,0,0,39" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom"  KeyDown="UserTxt_KeyDown"  Width="400" OpacityMask="Black" Foreground="Black" LostFocus="UserTxt_LostFocus" GotFocus="UserTxt_GotFocus">
             <TextBox.Background>
                 <ImageBrush ImageSource="Resources/Writt.png" AlignmentX="Left" AlignmentY="Top" Stretch="None"/>
             </TextBox.Background>
-            </TextBox>
+        </TextBox>
         <Button Name="TxtPost" Content="Отправить" HorizontalAlignment="Left" Margin="454,0,0,39" VerticalAlignment="Bottom" MinWidth="161" MinHeight="56" Click="TxtPost_Click" Background="#4C0000FF"/>
+        <Button HorizontalAlignment="Left" Margin="576,0,0,100" VerticalAlignment="Bottom" Width="39" Height="39" Click="Button_Click">
+            <Button.Content>
+                <Image Source ="Resources/Mic.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Button.Content>
+        </Button>
     </Grid>
 
 </Window>
