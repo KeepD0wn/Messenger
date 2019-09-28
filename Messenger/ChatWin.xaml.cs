@@ -37,7 +37,7 @@ namespace Messenger
         {            
             while (true)
             {                
-                string qu = "select * from MessengerMessege";
+                string qu = "select * from MessengerMessege";  
                 data.Clear();
                 using (SqlCommand com = new SqlCommand(qu, main.Connect))
                 {
@@ -48,7 +48,7 @@ namespace Messenger
                         data.Add(new string[2]);
                         data[data.Count - 1][0] = reader[1].ToString();
                         data[data.Count - 1][1] = reader[2].ToString();
-                    }
+                    }                    
                     reader.Close();
                 }
 
