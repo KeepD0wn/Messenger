@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Data.SqlClient;
 using System.Threading;
 using Microsoft.Speech.Recognition;
+using System.Windows.Navigation;
 
 namespace Messenger
 {
@@ -126,8 +127,9 @@ namespace Messenger
                 ImageBrush textImageBrush = new ImageBrush();
                 textImageBrush.ImageSource =
                     new BitmapImage(
-                        new Uri("Resources/Writt.png", UriKind.Relative)
+                        new Uri("pack://application:,,,/Resources/Writt.png", UriKind.Absolute)
                     );
+
                 textImageBrush.AlignmentX = AlignmentX.Left;
                 textImageBrush.AlignmentY = AlignmentY.Top;
                 textImageBrush.Stretch = Stretch.None;
