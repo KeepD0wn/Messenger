@@ -10,7 +10,6 @@ C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\MainWindow.baml
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Messenger.g.resources
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Messenger.Properties.Resources.resources
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Messenger.csproj.GenerateResource.cache
-C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Messenger.csproj.CoreCompileInputs.cache
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Messenger.exe
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Messenger.pdb
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\ChatWin.g.cs
@@ -19,3 +18,5 @@ C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Registr.g.cs
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Registr.baml
 C:\Users\gvozd\source\repos\Messenger\Messenger\bin\Debug\Microsoft.Speech.dll
 C:\Users\gvozd\source\repos\Messenger\Messenger\obj\Debug\Messenger.csproj.CopyComplete
+C:\Users\gvozd\source\repos\Messenger\Messenger\bin\Debug\NAudio.dll
+C:\Users\gvozd\source\repos\Messenger\Messenger\bin\Debug\NAudio.xml

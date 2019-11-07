@@ -24,78 +24,107 @@ namespace Messenger
     public partial class ChatWin : Window
     {       
         public List<string[]> data = new List<string[]>();
-        MainWindow main = new MainWindow();
-        int x = 0;
 
         public ChatWin()
         {
             InitializeComponent();
             Thread th = new Thread(UpdateTable);
-            th.Start();            
+            th.Start();
         }        
-
-        public void UpdateTable() 
+         
+        /// <summary>
+        /// постоянно прослушивает сервер на новые сообщения от других юзеров
+        /// </summary>
+        public void GetMessage()
         {            
             while (true)
-            {                //замутить оптимизейшн
-                string qu = "select * from MessengerMessege";  
-                data.Clear();
-                using (SqlCommand com = new SqlCommand(qu, main.Connect))
+            {
+                byte[] IncomingMessage = new byte[256]; 
+                do
                 {
-                    SqlDataReader reader = com.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        data.Add(new string[2]);
-                        data[data.Count - 1][0] = reader[1].ToString();
-                        data[data.Count - 1][1] = reader[2].ToString();
-                    }                    
-                    reader.Close();
+                    int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length); //ждём сообщения
                 }
+                while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
 
-                ClearTable();
-                foreach (string[] s in data)
-                {                                        
-                    Dispatcher.BeginInvoke(new ThreadStart(delegate
-                    { TextBlock newBlock = new TextBlock();
-                      newBlock.Text = s[0] + ":  " + s[1];
-                      lb.Children.Add(newBlock);
-                    }));                       
-                }
-                
-                if (x == 0)
+                string msgWrite = Encoding.UTF8.GetString(IncomingMessage).TrimEnd('\0');
+                string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries); //разделяем пришедшую команду
+                Dispatcher.BeginInvoke(new ThreadStart(delegate
                 {
-                    Dispatcher.BeginInvoke(new ThreadStart(delegate { ScrollDown();}));
-                    x += 1;
-                }
-                Thread.Sleep(500);
-            }
-        }
-
-        public void ClearTable()
-        {
-            foreach (string[] s in data)
-            {                                
-                Dispatcher.BeginInvoke(new ThreadStart(delegate { lb.Children.Clear(); }));
-            }
-        }
-        
-        private void TxtPost_Click(object sender, RoutedEventArgs e)
-        {            
-            if (UserTxt.Text.Trim()!=string.Empty)
-            {               
-                    string sql = string.Format("Insert into MessengerMessege (MessegeUserName,MessegeText,MessegeDate) values (@login , @txt , GETDATE());");
-                    using (SqlCommand cmd = new SqlCommand(sql, main.Connect))
-                    {
-                        cmd.Parameters.AddWithValue("@login",User.Login);
-                        cmd.Parameters.AddWithValue("@txt",UserTxt.Text);
-                        cmd.ExecuteNonQuery();
-                    }
-                    UserTxt.Text = string.Empty;
-                    ScrollDown();
+                    TextBlock newBlock = new TextBlock();
+                    newBlock.Text = words[1] + ":  " + words[2];
+                    lb.Children.Add(newBlock);
+                }));
             }            
         }
 
+        /// <summary>
+        /// выводит все сообщения на стекпанел и принимает их с сервера
+        /// </summary>
+        public void UpdateTable() 
+        {
+            string message = $"3:&#:K"; //просим отправить все сообщения с сервера
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+            MainWindow.Stream.Write(buffer, 0, buffer.Length);
+
+            byte[] IncomingMessage = new byte[256]; //принимаем сколько сообщений надо прочитать 
+            do
+            {
+                int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length); //ждём сообщения
+            }
+            while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
+
+            string msgWrite = Encoding.UTF8.GetString(IncomingMessage).TrimEnd('\0');
+            int count = Convert.ToInt32(msgWrite);
+
+            for (int i=0;i<count;i++)
+            {
+                byte[] IncomingMessage2 = new byte[256];
+                do
+                {
+                    int bytes = MainWindow.Stream.Read(IncomingMessage2, 0, IncomingMessage2.Length); //ждём сообщения
+                    string msgWrite2 = Encoding.UTF8.GetString(IncomingMessage2).TrimEnd('\0'); //переводим в строку без лишних символов
+                    string[] words = msgWrite2.Split(':');
+                    data.Add(new string[2]); //записываем сообщения в лист 
+                    data[data.Count - 1][0] = words[1]; //пишем ник
+                    data[data.Count - 1][1] = words[2]; //пишем сообщение
+                }
+                while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
+            }
+           
+            foreach (string[] s in data)
+            {
+                Dispatcher.BeginInvoke(new ThreadStart(delegate
+                {
+                    TextBlock newBlock = new TextBlock();
+                    newBlock.Text = s[0] + ":  " + s[1];
+                    lb.Children.Add(newBlock);
+                }));
+            }
+
+            Dispatcher.BeginInvoke(new ThreadStart(ScrollDown));
+            Thread.Sleep(5);
+            GetMessage();
+        }
+
+        /// <summary>
+        /// отправляем сообщение
+        /// </summary>
+        private void TxtPost_Click(object sender, RoutedEventArgs e)
+        {            
+            if (UserTxt.Text.Trim()!=string.Empty) //проверка на пустую строку
+            {
+                string message = $"1:&#:{User.Login}:&#:{UserTxt.Text}";
+                byte[] buffer = Encoding.UTF8.GetBytes(message);
+                MainWindow.Stream.Write(buffer, 0, buffer.Length); //отправляем сообщение
+
+                UserTxt.Text = string.Empty;
+                ScrollDown();
+            }            
+        }
+
+        /// <summary>
+        /// опускаем чат вниз
+        /// </summary>
         public void ScrollDown() //мотаем вниз
         {
             if (lb.Children.Count != 0)
@@ -104,7 +133,7 @@ namespace Messenger
 
         private void UserTxt_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Enter)
+            if(e.Key == Key.Enter) //нажатие на энтр отправляет сообщение
             {
                 TxtPost_Click(sender, e);
             }            
@@ -112,14 +141,17 @@ namespace Messenger
         
         private void UserTxt_LostFocus(object sender, RoutedEventArgs e)
         {
-            SetPicture();
+            SetPicture(); //при нажатии на окно ввода картинка появляется
         }
 
         private void UserTxt_GotFocus(object sender, RoutedEventArgs e)
         {
-            UserTxt.Background = null;
+            UserTxt.Background = null; //при нажатии на окно ввода картинка исчезает
         }
 
+        /// <summary>
+        /// устанавливаем картинку "введите сообщение" в левый верхний угол
+        /// </summary>
         void SetPicture()
         {
             if (UserTxt.Text == string.Empty)
@@ -137,6 +169,9 @@ namespace Messenger
             }
         }
 
+        /// <summary>
+        /// кнопка микрофона по распознаванию голосовых команд
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             MicButton.Background = Brushes.DarkSlateGray;
@@ -164,6 +199,11 @@ namespace Messenger
             {
                 Environment.Exit(0);
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Environment.Exit(0); //при нажатии на крести все формы закрываются
         }
     }
 }

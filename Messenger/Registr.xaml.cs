@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Data.SqlClient;
+using System.Net.Sockets;
+
 
 namespace Messenger
 {
@@ -19,26 +21,35 @@ namespace Messenger
     /// Логика взаимодействия для Registr.xaml
     /// </summary>
     public partial class Registr : Window
-    {
-        MainWindow main = new MainWindow();
+    {       
         public Registr()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// кнопка ввода
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            try
+            if (RLog.Text != "" && RPas.Text != "")
             {
-                if (RLog.Text != "" && RPas.Text != "")
+                string message = $"0:&#:{RLog.Text}:&#:{RPas.Text}"; //говорим что хотим добавить
+                byte[] buffer = Encoding.UTF8.GetBytes(message);
+                MainWindow.Stream.Write(buffer, 0, buffer.Length);
+
+                byte[] IncomingMessage = new byte[128]; //ответ сервера всё ок или нет (есть такой логин или нет)
+                do
                 {
-                    string qu = "Insert into MessengerUsers (UserName,UserPassword) values (@log,@pas);";
-                    using (SqlCommand com = new SqlCommand(qu, main.Connect))
-                    {
-                        com.Parameters.AddWithValue("@log", RLog.Text);
-                        com.Parameters.AddWithValue("@pas",RPas.Text);
-                        com.ExecuteNonQuery();
-                    }
+                    int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length);
+                }
+                while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
+
+                string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0');
+                string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (words[1]== "confirmed")
+                {
                     MessageBox.Show("Регистрация успешно подтверждена", "Подтверждение", MessageBoxButton.OK, MessageBoxImage.None);
                     RLog.Text = string.Empty;
                     RPas.Text = string.Empty;
@@ -46,21 +57,20 @@ namespace Messenger
                 }
                 else
                 {
-                    MessageBox.Show("Введите данные корректно", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                    MessageBox.Show("Пользователь с таким логином уже имеется", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    RLog.Text = string.Empty;
+                    RPas.Text = string.Empty;
+                }               
             }
-            catch (System.Data.SqlClient.SqlException)
+            else
             {
-                MessageBox.Show("Пользователь с токим логином уже имеется", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                RLog.Text = string.Empty;
-                RPas.Text = string.Empty;
+                MessageBox.Show("Введите данные корректно", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
         }
 
         private void RLog_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter) //нажатие на энтр в поле логина приравнивается к кнопке ввода
             {
                 Button_Click(sender, e);
             }
@@ -68,7 +78,7 @@ namespace Messenger
 
         private void RPas_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter) //нажатие на энтр в поле пароля приравнивается к кнопке ввода
             {
                 Button_Click(sender, e);
             }

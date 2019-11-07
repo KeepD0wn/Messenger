@@ -12,11 +12,6 @@ namespace Messenger
         public static string Login { get; set; }
         public string Password { get; set; }
 
-        public User()
-        {
-
-        }
-
         public User(int id,string login,string password)
         {
             Id = id;

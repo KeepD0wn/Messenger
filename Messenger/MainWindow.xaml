@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Messenger"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="850" ResizeMode="CanMinimize">
+        Title="MainWindow" Height="500" Width="850" ResizeMode="CanMinimize" Closing="Window_Closing">
     <Grid  Background="#FFBBE6FF" >
         <TextBox Name="Passwtb" HorizontalAlignment="Center" Height="43" Margin="300,252,174,124" TextWrapping="NoWrap" VerticalAlignment="Center" Width="318" FontSize="22" Background="#7F9E9E9E" KeyDown="Passwtb_KeyDown"/>
         <Label Content="Вход" HorizontalAlignment="Center" Margin="300,32,241,291" VerticalAlignment="Center" Height="96" Width="251" FontSize="72" FontWeight="Bold"/>
