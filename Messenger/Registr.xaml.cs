@@ -57,7 +57,7 @@ namespace Messenger
                 }
                 else
                 {
-                    MessageBox.Show("Пользователь с таким логином уже имеется", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Пользователь с таким логином уже имеется. Введите логин английскими буквами a-z, логин должен содержать не менее 4 символов", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     RLog.Text = string.Empty;
                     RPas.Text = string.Empty;
                 }               

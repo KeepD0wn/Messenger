@@ -30,11 +30,11 @@ namespace Messenger
         const int port = 12000;
         public static NetworkStream Stream { get { return stream; } }
         
-        public MainWindow()
+        public  MainWindow()
         {
             InitializeComponent(); 
             client = new TcpClient();
-            client.Connect(ip, port); //подключаемся к серверу 95.163.180.18
+            client.Connect(ip, port); //подключаемся к серверу 85.192.34.44
             stream = client.GetStream(); //получаем сетевой поток для чтения и записи
         }       
         
@@ -43,7 +43,7 @@ namespace Messenger
         /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string message = $"2:&#:{Logintb.Text}:&#:{Passwtb.Text}";
+            string message = $"2:&#:{Logintb.Text}:&#:{Passwtb.Text}"; //запрос подтверждения данных
             byte[] buffer = Encoding.UTF8.GetBytes(message);
             Stream.Write(buffer, 0, buffer.Length);
 
