@@ -23,6 +23,8 @@
                 <Image Source ="Resources/Mic.png" VerticalAlignment="Center" HorizontalAlignment="Center" OpacityMask="#FFC72C2C"/>
             </Button.Content>
         </Button>
+        <Button Content="слушать сообщение" HorizontalAlignment="Left" Margin="454,0,0,100" VerticalAlignment="Bottom" Width="87" Height="39" Click="Button_Click_1"/>
+        <Button Name="but1" Content="записать сообщение" HorizontalAlignment="Left" Margin="640,0,0,39" VerticalAlignment="Bottom" Width="94" Height="83" Click="But1_Click"/>
     </Grid>
 
 </Window>

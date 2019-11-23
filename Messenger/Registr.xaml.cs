@@ -30,55 +30,62 @@ namespace Messenger
         /// <summary>
         /// кнопка ввода
         /// </summary>
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e) 
         {
-            if (RLog.Text != "" && RPas.Text != "")
+            try
             {
-                string message = $"0:&#:{RLog.Text}:&#:{RPas.Text}"; //говорим что хотим добавить
-                byte[] buffer = Encoding.UTF8.GetBytes(message);
-                MainWindow.Stream.Write(buffer, 0, buffer.Length);
-
-                byte[] IncomingMessage = new byte[128]; //ответ сервера всё ок или нет (есть такой логин или нет)
-                do
+                if (RLog.Text != "" && RPas.Text != "")
                 {
-                    int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length);
-                }
-                while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
+                    string message = $"0:&#:{RLog.Text}:&#:{RPas.Text}"; //говорим что хотим добавить
+                    byte[] buffer = Encoding.UTF8.GetBytes(message);
+                    MainWindow.Stream.Write(buffer, 0, buffer.Length);
 
-                string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0');
-                string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
+                    byte[] IncomingMessage = new byte[128]; //ответ сервера всё ок или нет (есть такой логин или нет)
+                    do
+                    {
+                        int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length);
+                    }
+                    while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
 
-                if (words[1]== "confirmed")
-                {
-                    MessageBox.Show("Регистрация успешно подтверждена", "Подтверждение", MessageBoxButton.OK, MessageBoxImage.None);
-                    RLog.Text = string.Empty;
-                    RPas.Text = string.Empty;
-                    this.Close();
+                    string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0'); //декодируем и разделяем на команды
+                    string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (words[1] == "confirmed")
+                    {
+                        MessageBox.Show("Регистрация успешно подтверждена", "Подтверждение", MessageBoxButton.OK, MessageBoxImage.None);
+                        RLog.Text = string.Empty;
+                        RPas.Text = string.Empty;
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Пользователь с таким логином уже имеется. Введите логин английскими буквами a-z, логин должен содержать не менее 4 символов", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        RLog.Text = string.Empty;
+                        RPas.Text = string.Empty;
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Пользователь с таким логином уже имеется. Введите логин английскими буквами a-z, логин должен содержать не менее 4 символов", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    RLog.Text = string.Empty;
-                    RPas.Text = string.Empty;
-                }               
+                    MessageBox.Show("Введите данные корректно", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                MessageBox.Show("Введите данные корректно", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }            
         }
 
-        private void RLog_KeyDown(object sender, KeyEventArgs e)
+        private void RLog_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле логина приравнивается к кнопке ввода
         {
-            if (e.Key == Key.Enter) //нажатие на энтр в поле логина приравнивается к кнопке ввода
+            if (e.Key == Key.Enter) 
             {
                 Button_Click(sender, e);
             }
         }
 
-        private void RPas_KeyDown(object sender, KeyEventArgs e)
+        private void RPas_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле пароля приравнивается к кнопке ввода
         {
-            if (e.Key == Key.Enter) //нажатие на энтр в поле пароля приравнивается к кнопке ввода
+            if (e.Key == Key.Enter) 
             {
                 Button_Click(sender, e);
             }
