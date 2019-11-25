@@ -28,7 +28,7 @@ namespace Messenger
         static NetworkStream stream = default;
         static NetworkStream streamVoice = default;
 
-        const string ip = "127.0.0.1"; //85.192.34.44
+        const string ip = "85.192.34.44"; //85.192.34.44
         const int port = 12000;
         const int portVoice = 12001;
 
