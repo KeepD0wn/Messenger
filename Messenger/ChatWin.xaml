@@ -23,8 +23,15 @@
                 <Image Source ="Resources/Mic.png" VerticalAlignment="Center" HorizontalAlignment="Center" OpacityMask="#FFC72C2C"/>
             </Button.Content>
         </Button>
-        <Button Content="слушать сообщение" HorizontalAlignment="Left" Margin="454,0,0,100" VerticalAlignment="Bottom" Width="87" Height="39" Click="Button_Click_1"/>
-        <Button Name="but1" Content="записать сообщение" HorizontalAlignment="Left" Margin="640,0,0,39" VerticalAlignment="Bottom" Width="94" Height="83" Click="But1_Click"/>
+        <Button  HorizontalAlignment="Left" Margin="454,0,0,100" VerticalAlignment="Bottom" Background="#BF9E9E9E" Width="87" Height="39" Click="Button_Click_1">
+            <Button.Content>
+                <Image Source ="Resources/Headphones.png" VerticalAlignment="Center" HorizontalAlignment="Center" OpacityMask="#FFC72C2C" Height="39" Width="46"/>
+            </Button.Content>
+        </Button>
+        <Label Name="VoiceWarning"  Foreground="ForestGreen" Visibility="Hidden" Content="Идёт запись (20сек), для&#xD;&#xA;остановки нажмите ещё раз" HorizontalAlignment="Left" Margin="620,0,0,100"  VerticalAlignment="Bottom" Height="44" Width="172"/>
+        <Button Name="Stop" HorizontalAlignment="Left" Visibility="Hidden" Margin="620,0,0,56" Background="CornflowerBlue" VerticalAlignment="Bottom" Width="40" Height="39" Click="Stop_Click" BorderBrush="Black" Foreground="Black" OpacityMask="Black">
+            <Image Source ="Resources/Stop.png" VerticalAlignment="Center" HorizontalAlignment="Center" OpacityMask="#FFC72C2C"/>
+        </Button>       
     </Grid>
 
 </Window>

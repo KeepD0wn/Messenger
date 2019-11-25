@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Data.SqlClient;
 using System.Reflection;
 using System.Net.Sockets;
+using System.IO;
 
 namespace Messenger
 {
@@ -42,6 +43,7 @@ namespace Messenger
             try
             {
                 InitializeComponent();
+                Directory.CreateDirectory($@"C:\Users\{Environment.UserName}\Messenger");
 
                 client = new TcpClient();
                 clientVoice = new TcpClient();

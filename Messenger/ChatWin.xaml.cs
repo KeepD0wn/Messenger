@@ -31,6 +31,7 @@ namespace Messenger
         static WaveFileWriter waveFile;
         WaveInEvent waveSource = new WaveInEvent();
         private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
+        static System.Media.SoundPlayer player = new System.Media.SoundPlayer();
 
         public ChatWin()
         {
@@ -39,7 +40,8 @@ namespace Messenger
             th.Start();
 
             waveSource.DataAvailable += WaveSource_DataAvailable;
-            myTimer.Tick += OnStopRecording; 
+            myTimer.Tick += OnStopRecording;
+            player.Disposed +=HideAllBtn;
         }    
 
         /// <summary>
@@ -75,7 +77,7 @@ namespace Messenger
 
                 }
 
-                string path = $"C:\\Users\\{Environment.UserName}\\Desktop\\txtMes.txt";
+                string path = $@"C:\Users\{Environment.UserName}\Messenger\txtMes.txt";
                 File.WriteAllBytes(path, dataByte);
                 XmlSerializer ser = new XmlSerializer(typeof(List<string[]>));                
                 FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
@@ -179,7 +181,7 @@ namespace Messenger
 
                 }
 
-                File.WriteAllBytes($"C:\\Users\\{Environment.UserName}\\Desktop\\ClientSoundMes.wav", data);
+                File.WriteAllBytes($@"C:\Users\{Environment.UserName}\Messenger\ClientSoundMes.wav", data);
             }
             catch
             {
@@ -236,36 +238,24 @@ namespace Messenger
         }
 
         /// <summary>
-        /// кнопка микрофона по распознаванию голосовых команд
+        /// кнопка записи звука
         /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MicButton.Background = Brushes.DarkSlateGray;
-            System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("ru-ru");
-            using (SpeechRecognitionEngine speech = new SpeechRecognitionEngine(culture)) 
+            try
             {
-                speech.SetInputToDefaultAudioDevice();
+                VoiceWarning.Visibility = Visibility.Visible;
+                waveSource.WaveFormat = new WaveFormat(44100, 1);
+                string tempFile = ($@"C:\Users\{Environment.UserName}\Messenger\SoundMessage.wav");
+                waveFile = new WaveFileWriter(tempFile, waveSource.WaveFormat); 
+                waveSource.StartRecording();
 
-                speech.SpeechRecognized += OnSpeechRecognized;
-
-                Choices num = new Choices();
-                num.Add(new string[] { "закрой приложение" });
-
-                GrammarBuilder grammarBuilder = new GrammarBuilder();
-                grammarBuilder.Append(num);
-
-                Grammar grammar = new Grammar(grammarBuilder);
-                speech.LoadGrammar(grammar);
-
-                speech.RecognizeAsync(RecognizeMode.Single);
+                myTimer.Interval = 20000;
+                myTimer.Start();
             }
-        }
-
-        void OnSpeechRecognized(object sender, SpeechRecognizedEventArgs e)
-        {
-            if (e.Result.Confidence > 0.6)
+            catch
             {
-                Environment.Exit(0);
+                OnStopRecording(this,null);                
             }
         }
 
@@ -281,11 +271,9 @@ namespace Messenger
         {
             try
             {
-                using (System.Media.SoundPlayer player = new System.Media.SoundPlayer()) 
-                {
-                    player.SoundLocation = $@"C:\Users\{Environment.UserName}\Desktop\ClientSoundMes.wav";
-                    player.Play();
-                }
+                player.SoundLocation = $@"C:\Users\{Environment.UserName}\Messenger\ClientSoundMes.wav";
+                player.Play();
+                Stop.Visibility = Visibility.Visible;
             }
             catch
             {
@@ -293,28 +281,7 @@ namespace Messenger
             }
             
         }     
-
-        /// <summary>
-        /// кнопка записи звука
-        /// </summary>
-        private void But1_Click(object sender, RoutedEventArgs e) //трай или во время записи отрубать кнопку
-        {
-            try
-            {
-                waveSource.WaveFormat = new WaveFormat(44100, 1);
-                string tempFile = ($@"C:\Users\{Environment.UserName}\Desktop\SoundMessage.wav");
-                waveFile = new WaveFileWriter(tempFile, waveSource.WaveFormat); //экспшн файл занят
-                waveSource.StartRecording();
-
-                myTimer.Interval = 1000;
-                myTimer.Start();
-            }
-            catch
-            {
-
-            }            
-        }
-
+       
         /// <summary>
         /// метод останавливает запись и отправляет сообщения всем клиентам
         /// </summary>
@@ -327,6 +294,7 @@ namespace Messenger
                 myTimer.Stop();
 
                 SendSoundToServer();
+                VoiceWarning.Visibility = Visibility.Hidden;
             }
             catch (Exception ex)
             {
@@ -343,12 +311,8 @@ namespace Messenger
         }
 
         void SendSoundToServer() 
-        {
-            string message = $"6:&#:K"; //просим сервер слушать входящее голосовое
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
-            MainWindow.Stream.Write(buffer, 0, buffer.Length);
-                        
-            byte[] file = File.ReadAllBytes($"C:\\Users\\{Environment.UserName}\\Desktop\\SoundMessage.wav");
+        {                        
+            byte[] file = File.ReadAllBytes($@"C:\Users\{Environment.UserName}\Messenger\SoundMessage.wav");
             byte[] fileLength = BitConverter.GetBytes(file.Length); //4 байта
             byte[] package = new byte[4 + file.Length];
             fileLength.CopyTo(package, 0); 
@@ -367,6 +331,18 @@ namespace Messenger
                 bytesSent += packetSize;
                 bytesLeft -= packetSize;
             }
+        }
+
+        private void Stop_Click(object sender, RoutedEventArgs e) //пауза при воспроизведении аудио
+        {
+            player.Stop();
+            player.Dispose();
+            string d = sender.ToString();
+        }
+
+        private void HideAllBtn(object sender, EventArgs e)
+        {
+            Stop.Visibility = Visibility.Hidden;
         }
     }
 }
