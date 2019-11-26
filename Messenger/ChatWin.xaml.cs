@@ -337,7 +337,6 @@ namespace Messenger
         {
             player.Stop();
             player.Dispose();
-            string d = sender.ToString();
         }
 
         private void HideAllBtn(object sender, EventArgs e)
