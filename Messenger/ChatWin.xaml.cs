@@ -36,8 +36,7 @@ namespace Messenger
         public ChatWin()
         {
             InitializeComponent();
-            Thread th = new Thread(UpdateTable);
-            th.Start();
+            UpdateTableAsync();
 
             waveSource.DataAvailable += WaveSource_DataAvailable;
             myTimer.Tick += OnStopRecording;
@@ -95,7 +94,6 @@ namespace Messenger
                 }
 
                 Dispatcher.BeginInvoke(new ThreadStart(ScrollDown));
-                Thread.Sleep(10);
                 GetMessage();
             }
             catch
@@ -104,6 +102,11 @@ namespace Messenger
                 MessageBox.Show("Скорее всего сервер разовал соединение", "Messenger", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
             }
+        }
+
+        public async void UpdateTableAsync()
+        {
+            await Task.Run(()=>UpdateTable());
         }
 
         /// <summary>

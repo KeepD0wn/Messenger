@@ -23,8 +23,7 @@ namespace Messenger
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
-    {       
-        User user; 
+    {               
         static NetworkStream stream = default;
         static NetworkStream streamVoice = default;
 
@@ -84,7 +83,7 @@ namespace Messenger
             
                 if (words[1] == "confirmed")
                 {
-                    user = new User
+                    User user = new User
                             (
                               Convert.ToInt32(words[3]),
                               words[4].ToString(),
