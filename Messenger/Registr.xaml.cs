@@ -30,39 +30,14 @@ namespace Messenger
         /// <summary>
         /// кнопка ввода
         /// </summary>
-        private void Button_Click(object sender, RoutedEventArgs e) 
+        private void Button_RegEnter(object sender, RoutedEventArgs e) 
         {
             try
             {
                 if (RLog.Text != "" && RPas.Text != "")
                 {
-                    string message = $"0:&#:{RLog.Text}:&#:{RPas.Text}"; //говорим что хотим добавить
-                    byte[] buffer = Encoding.UTF8.GetBytes(message);
-                    MainWindow.Stream.Write(buffer, 0, buffer.Length);
-
-                    byte[] IncomingMessage = new byte[128]; //ответ сервера всё ок или нет (есть такой логин или нет)
-                    do
-                    {
-                        int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length);
-                    }
-                    while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
-
-                    string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0'); //декодируем и разделяем на команды
-                    string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
-
-                    if (words[1] == "confirmed")
-                    {
-                        MessageBox.Show("Регистрация успешно подтверждена", "Подтверждение", MessageBoxButton.OK, MessageBoxImage.None);
-                        RLog.Text = string.Empty;
-                        RPas.Text = string.Empty;
-                        this.Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Пользователь с таким логином уже имеется. Введите логин английскими буквами a-z, логин должен содержать не менее 4 символов", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        RLog.Text = string.Empty;
-                        RPas.Text = string.Empty;
-                    }
+                    string[] words = GetConfirmLine();
+                    CompareData(words); //проверка нет ли уже такого юзера
                 }
                 else
                 {
@@ -75,19 +50,64 @@ namespace Messenger
             }            
         }
 
-        private void RLog_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле логина приравнивается к кнопке ввода
+        private void CompareData(string[] words)
         {
-            if (e.Key == Key.Enter) 
+            if (words[1] == "confirmed")
             {
-                Button_Click(sender, e);
+                MessageBox.Show("Регистрация успешно подтверждена", "Подтверждение", MessageBoxButton.OK, MessageBoxImage.None);
+                RLog.Text = string.Empty;
+                RPas.Text = string.Empty;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Пользователь с таким логином уже имеется. Введите логин английскими буквами a-z, логин должен содержать не менее 4 символов", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                RLog.Text = string.Empty;
+                RPas.Text = string.Empty;
             }
         }
 
-        private void RPas_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле пароля приравнивается к кнопке ввода
+        private string[] GetConfirmLine()
+        {
+            byte[] IncomingMessage = GetServerAnswer();
+            return DecodeServerAnswer(IncomingMessage);
+        }
+
+        private static string[] DecodeServerAnswer(byte[] IncomingMessage)
+        {
+            string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0'); //декодируем и разделяем на команды
+            string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
+            return words;
+        }
+
+        private byte[] GetServerAnswer()
+        {
+            string message = $"0:&#:{RLog.Text}:&#:{RPas.Text}"; //говорим что хотим добавить
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+            MainWindow.Stream.Write(buffer, 0, buffer.Length);
+
+            byte[] IncomingMessage = new byte[128]; //ответ сервера всё ок или нет (есть такой логин или нет)
+            do
+            {
+                int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length);
+            }
+            while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
+            return IncomingMessage;
+        }
+
+        private void Log_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле логина приравнивается к кнопке ввода
         {
             if (e.Key == Key.Enter) 
             {
-                Button_Click(sender, e);
+                Button_RegEnter(sender, e);
+            }
+        }
+
+        private void Pas_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле пароля приравнивается к кнопке ввода
+        {
+            if (e.Key == Key.Enter) 
+            {
+                Button_RegEnter(sender, e);
             }
         }
     }

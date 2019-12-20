@@ -18,12 +18,12 @@
             </TextBox.Background>
         </TextBox>
         <Button Name="TxtPost" Content="Отправить" HorizontalAlignment="Left" Margin="454,0,0,39" VerticalAlignment="Bottom" MinWidth="161" MinHeight="56" Click="TxtPost_Click" Background="#4C0000FF"/>
-        <Button Name="MicButton" HorizontalAlignment="Left" Margin="546,0,0,100" VerticalAlignment="Bottom" Width="69" Height="39" Click="Button_Click" Background="#BF9E9E9E" BorderBrush="Black" Foreground="Black" OpacityMask="Black">
+        <Button Name="MicButton" HorizontalAlignment="Left" Margin="546,0,0,100" VerticalAlignment="Bottom" Width="69" Height="39" Click="Button_StartRecording" Background="#BF9E9E9E" BorderBrush="Black" Foreground="Black" OpacityMask="Black">
             <Button.Content>
                 <Image Source ="Resources/Mic.png" VerticalAlignment="Center" HorizontalAlignment="Center" OpacityMask="#FFC72C2C"/>
             </Button.Content>
         </Button>
-        <Button  HorizontalAlignment="Left" Margin="454,0,0,100" VerticalAlignment="Bottom" Background="#BF9E9E9E" Width="87" Height="39" Click="Button_Click_1">
+        <Button  HorizontalAlignment="Left" Margin="454,0,0,100" VerticalAlignment="Bottom" Background="#BF9E9E9E" Width="87" Height="39" Click="Button_ListenVoiceMes">
             <Button.Content>
                 <Image Source ="Resources/Headphones.png" VerticalAlignment="Center" HorizontalAlignment="Center" OpacityMask="#FFC72C2C" Height="39" Width="46"/>
             </Button.Content>

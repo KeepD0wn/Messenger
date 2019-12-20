@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Messenger
 {
-    class User
+    public class User
     {
-        public int Id { get; set; }
-        public static string Login { get; set; }
-        public string Password { get; set; }
-
+        public int Id { get;private set; }
+        public string Login { get;private set; }
+        public string Password { get;private set; }
+        
         public User(int id,string login,string password)
         {
             Id = id;

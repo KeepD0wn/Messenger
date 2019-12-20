@@ -24,15 +24,12 @@ namespace Messenger
     /// </summary>
     public partial class MainWindow : Window
     {               
-        static NetworkStream stream = default;
-        static NetworkStream streamVoice = default;
+        static NetworkStream stream;
+        static NetworkStream streamVoice;
 
-        const string ip = "85.192.34.44"; //85.192.34.44
-        const int port = 12000;
-        const int portVoice = 12001;
-
-        TcpClient client = default;
-        TcpClient clientVoice = default;
+        readonly string ip = "127.0.0.1"; //85.192.34.44
+        readonly int port = 12000;
+        readonly int portVoice = 12001;
         
         public static NetworkStream Stream { get { return stream; } }
         public static NetworkStream StreamVoice { get { return streamVoice; } }
@@ -43,67 +40,92 @@ namespace Messenger
             {
                 InitializeComponent();
                 Directory.CreateDirectory($@"C:\Users\{Environment.UserName}\Messenger");
-
-                client = new TcpClient();
-                clientVoice = new TcpClient();
-
-                client.Connect(ip, port);
-                clientVoice.Connect(ip, portVoice);
-
-                stream = client.GetStream(); //получаем сетевой поток для чтения и записи
-                streamVoice = clientVoice.GetStream();
+                ConnectToServer();
             }
             catch
             {
                 MessageBox.Show("Невозможно подключиться к серверу", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
             }
-        }       
-        
+        }
+
+        private void ConnectToServer()
+        {
+            TcpClient client = new TcpClient();
+            TcpClient clientVoice = new TcpClient();
+
+            client.Connect(ip, port);
+            clientVoice.Connect(ip, portVoice);
+
+            stream = client.GetStream(); //получаем сетевой поток для чтения и записи
+            streamVoice = clientVoice.GetStream();
+        }
+
         /// <summary>
         /// кнопка ввода
         /// </summary>
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Enter(object sender, RoutedEventArgs e)
         {
             try
             {
-                string message = $"2:&#:{Logintb.Text}:&#:{Passwtb.Text}"; //запрос подтверждения данных
-                byte[] buffer = Encoding.UTF8.GetBytes(message);
-                Stream.Write(buffer, 0, buffer.Length);
-
-                byte[] IncomingMessage = new byte[128];  //ответ от сервера сходятся ли логин и пароль по БД
-                do
-                {
-                    int bytes = stream.Read(IncomingMessage, 0, IncomingMessage.Length);
-                }
-                while (stream.DataAvailable); // пока данные есть в потоке
-
-                string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0');
-                string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
-            
-                if (words[1] == "confirmed")
-                {
-                    User user = new User
-                            (
-                              Convert.ToInt32(words[3]),
-                              words[4].ToString(),
-                              words[5].ToString()
-                            );
-
-                    ChatWin cw = new ChatWin();
-                    this.Hide();
-                    cw.Show();
-                }
-                else
-                {
-                    Exep();
-                    return;
-                }
+                //проверяем логин и пароль через бд на сервере
+                string[] words = GetConfirmLine();
+                CompareData(words);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }       
+        }
+
+        private void CompareData(string [] words)
+        {
+            if (words[1] == "confirmed")
+            {
+                User user = new User
+                        (
+                          Convert.ToInt32(words[3]),
+                          words[4].ToString(),
+                          words[5].ToString()
+                        );
+
+                ChatWin cw = new ChatWin(user);
+                this.Hide();
+                cw.Show();
+            }
+            else
+            {
+                Exep();
+                return;
+            }
+        }
+
+        private string[] GetConfirmLine()
+        {
+            byte[] IncomingMessage = GetServerAnswer();
+            return DecodeServerAnswer(IncomingMessage);
+        }
+
+        private static string[] DecodeServerAnswer(byte[] IncomingMessage)
+        {
+            string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0');
+            string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
+            return words;
+        }
+
+        private byte[] GetServerAnswer()
+        {
+            string message = $"2:&#:{Logintb.Text}:&#:{Passwtb.Text}"; //запрос подтверждения данных
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+            Stream.Write(buffer, 0, buffer.Length);
+
+            byte[] IncomingMessage = new byte[128];  //ответ от сервера сходятся ли логин и пароль по БД
+            do
+            {
+                int bytes = Stream.Read(IncomingMessage, 0, IncomingMessage.Length);
+            }
+            while (Stream.DataAvailable); // пока данные есть в потоке
+            return IncomingMessage;
         }
 
         public void Exep()
@@ -116,7 +138,7 @@ namespace Messenger
         /// <summary>
         /// открывает окно регистрации
         /// </summary>
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void Button_CheckIn(object sender, RoutedEventArgs e)
         {
             Registr reg = new Registr();
             reg.Owner = this;
@@ -124,19 +146,19 @@ namespace Messenger
             reg.Show();
         }
 
-        private void Logintb_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле логина приравнивается к кнопке ввода
+        private void Login_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле логина приравнивается к кнопке ввода
         {
             if (e.Key == Key.Enter) 
             {
-                Button_Click(sender, e);
+                Button_Enter(sender, e);
             }
         }
 
-        private void Passwtb_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле пароля приравнивается к кнопке ввода
+        private void Password_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле пароля приравнивается к кнопке ввода
         {
             if (e.Key == Key.Enter) 
             {
-                Button_Click(sender, e);
+                Button_Enter(sender, e);
             }
         }
 

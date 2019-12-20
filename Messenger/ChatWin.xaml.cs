@@ -1,23 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Data.SqlClient;
 using System.Threading;
 using NAudio.Wave;
-using Microsoft.Speech.Recognition;
-using System.Windows.Navigation;
 using System.IO;
-using System.Net.Sockets;
 using System.Xml.Serialization;
 
 namespace Messenger
@@ -27,20 +19,23 @@ namespace Messenger
     /// </summary>
     public partial class ChatWin : Window
     {
+        User user;
         public List<string[]> listData = new List<string[]>();
+
         static WaveFileWriter waveFile;
         WaveInEvent waveSource = new WaveInEvent();
         private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
         static System.Media.SoundPlayer player = new System.Media.SoundPlayer();
 
-        public ChatWin()
+        public ChatWin(User user)
         {
             InitializeComponent();
+            this.user = user;            
             UpdateTableAsync();
 
             waveSource.DataAvailable += WaveSource_DataAvailable;
             myTimer.Tick += OnStopRecording;
-            player.Disposed +=HideAllBtn;
+            player.Disposed +=HideBtn;
         }    
 
         /// <summary>
@@ -48,50 +43,11 @@ namespace Messenger
         /// </summary>
         public void UpdateTable() 
         {
-            try 
+            try
             {
-                string message = $"3:&#:K"; //просим отправить все сообщения с сервера
-                byte[] buffer = Encoding.UTF8.GetBytes(message);
-                MainWindow.Stream.Write(buffer, 0, buffer.Length);
-
-                int bufferSize = 1024;
-                int bytesRead = 0;
-                int allBytesRead = 0;
-
-                byte[] length = new byte[4];
-                bytesRead = MainWindow.Stream.Read(length, 0, 4); //записываем размер файла в первые 4 байта
-                int fileLength = BitConverter.ToInt32(length, 0);
-
-                int bytesLeft = fileLength;
-                byte[] dataByte = new byte[fileLength];
-
-                while (bytesLeft > 0)
-                {
-
-                    int PacketSize = (bytesLeft > bufferSize) ? bufferSize : bytesLeft;
-
-                    bytesRead = MainWindow.Stream.Read(dataByte, allBytesRead, PacketSize);
-                    allBytesRead += bytesRead;
-                    bytesLeft -= bytesRead;
-
-                }
-
-                string path = $@"C:\Users\{Environment.UserName}\Messenger\txtMes.txt";
-                File.WriteAllBytes(path, dataByte);
-                XmlSerializer ser = new XmlSerializer(typeof(List<string[]>));                
-                FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
-                listData = (List<string[]>)ser.Deserialize(file);
-                file.Close();
-
-                foreach (string[] s in listData) //перекидывает данные из листа в блоки
-                {
-                    Dispatcher.BeginInvoke(new ThreadStart(delegate
-                    {
-                        TextBlock newBlock = new TextBlock();
-                        newBlock.Text = s[0] + ":  " + s[1];
-                        lb.Children.Add(newBlock);
-                    }));
-                }
+                byte[] dataByte = GetSerializedMessages();
+                DeserializeMessages();
+                DisplayMessages();
 
                 Dispatcher.BeginInvoke(new ThreadStart(ScrollDown));
                 GetMessage();
@@ -99,9 +55,60 @@ namespace Messenger
             catch
             {
                 Dispatcher.BeginInvoke(new ThreadStart(this.Hide));
-                MessageBox.Show("Скорее всего сервер разовал соединение", "Messenger", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Потеряно соединение", "Messenger", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
             }
+        }
+
+        private void DisplayMessages()
+        {
+            foreach (string[] s in listData) //перекидывает данные из листа в блоки
+            {
+                Dispatcher.BeginInvoke(new ThreadStart(delegate
+                {
+                    TextBlock newBlock = new TextBlock();
+                    newBlock.Text = s[0] + ":  " + s[1];
+                    lb.Children.Add(newBlock);
+                }));
+            }
+        }
+
+        private void DeserializeMessages()
+        {
+            string path = $@"C:\Users\{Environment.UserName}\Messenger\txtMes.txt";
+            File.WriteAllBytes(path, GetSerializedMessages());
+            XmlSerializer ser = new XmlSerializer(typeof(List<string[]>));
+            FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+            listData = (List<string[]>)ser.Deserialize(file);
+            file.Close();
+        }
+
+        private static byte[] GetSerializedMessages()
+        {
+            string message = $"3:&#:K"; //просим отправить все сообщения с сервера
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
+            MainWindow.Stream.Write(buffer, 0, buffer.Length);
+
+            int bufferSize = 1024;
+            int bytesRead = 0;
+            int allBytesRead = 0;
+
+            byte[] length = new byte[4];
+            bytesRead = MainWindow.Stream.Read(length, 0, 4); //записываем размер файла в первые 4 байта
+            int fileLength = BitConverter.ToInt32(length, 0);
+
+            int bytesLeft = fileLength;
+            byte[] dataByte = new byte[fileLength];
+
+            while (bytesLeft > 0)
+            {
+                int PacketSize = (bytesLeft > bufferSize) ? bufferSize : bytesLeft;
+
+                bytesRead = MainWindow.Stream.Read(dataByte, allBytesRead, PacketSize);
+                allBytesRead += bytesRead;
+                bytesLeft -= bytesRead;
+            }
+            return dataByte;
         }
 
         public async void UpdateTableAsync()
@@ -116,31 +123,51 @@ namespace Messenger
         {
             while (true)
             {
-                byte[] IncomingMessage = new byte[256];
-                do
-                {
-                    int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length); //ждём сообщения
-                }
-                while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
-
-                string msgWrite = Encoding.UTF8.GetString(IncomingMessage).TrimEnd('\0');
-                string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries); //разделяем пришедшую команду
-
-                switch (words[0])
-                {
-                    case "4":
-                        Dispatcher.BeginInvoke(new ThreadStart(delegate
-                        {
-                            TextBlock newBlock = new TextBlock();
-                            newBlock.Text = words[1] + ":  " + words[2];
-                            lb.Children.Add(newBlock);
-                        }));
-                        break;
-                    case "5":
-                        GetVoiceMsg();
-                        break;
-                }
+                string[] words = GetConfirmLine();
+                CompareData(words);
             }
+        }
+
+        private void CompareData(string[] words)
+        {
+            switch (words[0])
+            {
+                case "4":
+                    Dispatcher.BeginInvoke(new ThreadStart(delegate
+                    {
+                        TextBlock newBlock = new TextBlock();
+                        newBlock.Text = words[1] + ":  " + words[2];
+                        lb.Children.Add(newBlock);
+                    }));
+                    break;
+                case "5":
+                    GetVoiceMsg();
+                    break;
+            }
+        }
+
+        private static string[] GetConfirmLine()
+        {
+            byte[] IncomingMessage = GetServerAnswer();
+            return DecodeServerAnswer(IncomingMessage);
+        }
+
+        private static string[] DecodeServerAnswer(byte[] IncomingMessage)
+        {
+            string msgWrite = Encoding.UTF8.GetString(IncomingMessage).TrimEnd('\0');
+            string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries); //разделяем пришедшую команду
+            return words;
+        }
+
+        private static byte[] GetServerAnswer()
+        {
+            byte[] IncomingMessage = new byte[256];
+            do
+            {
+                int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length); //ждём сообщения
+            }
+            while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
+            return IncomingMessage;
         }
 
         /// <summary>
@@ -150,7 +177,7 @@ namespace Messenger
         {
             if (UserTxt.Text.Trim() != string.Empty) //проверка на пустую строку
             {
-                string message = $"1:&#:{User.Login}:&#:{UserTxt.Text}";
+                string message = $"1:&#:{user.Login}:&#:{UserTxt.Text}";
                 byte[] buffer = Encoding.UTF8.GetBytes(message);
                 MainWindow.Stream.Write(buffer, 0, buffer.Length); //отправляем сообщение
 
@@ -161,36 +188,31 @@ namespace Messenger
 
         void GetVoiceMsg()
         {
-            int bufferSize = 1024;
-            int allBytesRead = 0;
-
             try
             {
                 byte[] length = new byte[4];
                 int bytesRead = MainWindow.StreamVoice.Read(length, 0, 4);
                 int fileLength = BitConverter.ToInt32(length, 0);
 
+                int bufferSize = 1024;
+                int allBytesRead = 0;
                 int bytesLeft = fileLength;
                 byte[] data = new byte[fileLength];
 
                 while (bytesLeft > 0)
                 {
-
                     int PacketSize = (bytesLeft > bufferSize) ? bufferSize : bytesLeft;
 
                     bytesRead = MainWindow.StreamVoice.Read(data, allBytesRead, PacketSize);
                     allBytesRead += bytesRead;
                     bytesLeft -= bytesRead;
-
                 }
-
                 File.WriteAllBytes($@"C:\Users\{Environment.UserName}\Messenger\ClientSoundMes.wav", data);
             }
             catch
             {
                 MessageBox.Show("Не удалось принять голосовое сообщение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
         }
 
         /// <summary>
@@ -232,18 +254,22 @@ namespace Messenger
                     new BitmapImage(
                         new Uri("pack://application:,,,/Resources/Writt.png", UriKind.Absolute)
                     );
-
-                textImageBrush.AlignmentX = AlignmentX.Left;
-                textImageBrush.AlignmentY = AlignmentY.Top;
-                textImageBrush.Stretch = Stretch.None;
-                UserTxt.Background = textImageBrush;
+                SetImage(textImageBrush);
             }
+        }
+
+        private void SetImage(ImageBrush textImageBrush)
+        {
+            textImageBrush.AlignmentX = AlignmentX.Left;
+            textImageBrush.AlignmentY = AlignmentY.Top;
+            textImageBrush.Stretch = Stretch.None;
+            UserTxt.Background = textImageBrush;
         }
 
         /// <summary>
         /// кнопка записи звука
         /// </summary>
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_StartRecording(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -270,7 +296,7 @@ namespace Messenger
         /// <summary>
         /// кнопка для прослушивания голосового файла
         /// </summary>
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void Button_ListenVoiceMes(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -313,13 +339,9 @@ namespace Messenger
             waveFile.Write(e.Buffer, 0, e.BytesRecorded);
         }
 
-        void SendSoundToServer() 
-        {                        
-            byte[] file = File.ReadAllBytes($@"C:\Users\{Environment.UserName}\Messenger\SoundMessage.wav");
-            byte[] fileLength = BitConverter.GetBytes(file.Length); //4 байта
-            byte[] package = new byte[4 + file.Length];
-            fileLength.CopyTo(package, 0); 
-            file.CopyTo(package, 4); //начиная с 4 байта пишем файл
+        void SendSoundToServer()
+        {
+            byte[] package = GetVoiceFile();
 
             int bufferSize = 1024;
             int bytesSent = 0; //отталкиваемся с какого байта отправлять
@@ -336,13 +358,23 @@ namespace Messenger
             }
         }
 
+        private static byte[] GetVoiceFile()
+        {
+            byte[] file = File.ReadAllBytes($@"C:\Users\{Environment.UserName}\Messenger\SoundMessage.wav");
+            byte[] fileLength = BitConverter.GetBytes(file.Length); //4 байта
+            byte[] package = new byte[4 + file.Length];
+            fileLength.CopyTo(package, 0);
+            file.CopyTo(package, 4); //начиная с 4 байта пишем файл
+            return package;
+        }
+
         private void Stop_Click(object sender, RoutedEventArgs e) //пауза при воспроизведении аудио
         {
             player.Stop();
             player.Dispose();
         }
 
-        private void HideAllBtn(object sender, EventArgs e)
+        private void HideBtn(object sender, EventArgs e)
         {
             Stop.Visibility = Visibility.Hidden;
         }
