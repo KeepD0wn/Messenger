@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Threading;
 using NAudio.Wave;
-using System.IO;
-using System.Xml.Serialization;
 using System.Media;
 using Timer = System.Windows.Forms.Timer;
 
@@ -24,17 +19,19 @@ namespace Messenger
         User user;
         Server server = new Server();
         SoundClass sound = new SoundClass();
+        Serializator serializator = new Serializator();
 
-        static WaveFileWriter waveFile;
+        static WaveFileWriter waveFile; //TODO: перенести это в класс саунда
         WaveInEvent waveSource = new WaveInEvent();
         private Timer myTimer = new Timer();
         static SoundPlayer player = new SoundPlayer();
 
         public ChatWin(User user)
         {
-            InitializeComponent();
-            this.user = user;            
+            this.user = user;
+            InitializeComponent();                      
             UpdateTableAsync();
+            var task = Task.Run(()=> sound.WriteVoiceMsgFromServer());
 
             waveSource.DataAvailable += WaveSource_DataAvailable;
             myTimer.Tick += OnStopRecording;
@@ -48,10 +45,7 @@ namespace Messenger
         {
             try
             {
-                byte[] dataByte = GetSerializedMessages();
-                var messages= DeserializeMessages(dataByte);
-                DisplayMessages(messages);
-
+                DisplayMessages(serializator.GetAllMessages());
                 Dispatcher.BeginInvoke(new ThreadStart(ScrollDown));
             }
             catch
@@ -61,64 +55,7 @@ namespace Messenger
                 Environment.Exit(0);
             }
             GetMessage();
-        }
-
-        private void DisplayMessages(List<string[]> list)
-        {
-            foreach (string[] s in list) //перекидывает данные из листа в блоки
-            {
-                Dispatcher.BeginInvoke(new ThreadStart(delegate
-                {
-                    TextBlock newBlock = new TextBlock();
-                    newBlock.Text = s[0] + ":  " + s[1];
-                    lb.Children.Add(newBlock);
-                }));
-            }
-        }
-
-        private List<string[]> DeserializeMessages(byte [] data)
-        {
-            string path = $@"C:\Users\{Environment.UserName}\Messenger\txtMes.txt";
-            File.WriteAllBytes(path, data);
-            using (FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None))
-            {
-                XmlSerializer ser = new XmlSerializer(typeof(List<string[]>));
-                return (List<string[]>)ser.Deserialize(file);
-            }
-        }
-
-        private static byte[] GetSerializedMessages()
-        {
-            string message = $"3:&#:K"; //просим отправить все сообщения с сервера
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
-            MainWindow.Stream.Write(buffer, 0, buffer.Length);
-
-            int bufferSize = 1024;
-            int bytesRead = 0;
-            int allBytesRead = 0;
-
-            byte[] length = new byte[4];
-            bytesRead = MainWindow.Stream.Read(length, 0, 4); //записываем размер файла в первые 4 байта
-            int fileLength = BitConverter.ToInt32(length, 0);
-
-            int bytesLeft = fileLength;
-            byte[] dataByte = new byte[fileLength];
-
-            while (bytesLeft > 0)
-            {
-                int PacketSize = (bytesLeft > bufferSize) ? bufferSize : bytesLeft;
-
-                bytesRead = MainWindow.Stream.Read(dataByte, allBytesRead, PacketSize);
-                allBytesRead += bytesRead;
-                bytesLeft -= bytesRead;
-            }
-            return dataByte;
-        }
-
-        public async void UpdateTableAsync()
-        {
-            await Task.Run(()=>UpdateTable());
-        }
+        }        
 
         /// <summary>
         /// постоянно прослушивает сервер на новые сообщения от других юзеров
@@ -127,14 +64,7 @@ namespace Messenger
         {
             while (true)
             {
-                 string[] words = server.GetConfirmLine();
-                //byte[] IncomingMessage = new byte[256];
-                //do
-                //{
-                //    int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length); //ждём сообщения
-                //}
-                //while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
-                //string[] words = GetConfirmLine();
+                string[] words = server.GetServerAnswer();
                 CompareData(words);
             }
         }
@@ -151,53 +81,26 @@ namespace Messenger
                         lb.Children.Add(newBlock);
                     }));
                     break;
-                case "5":
-                    sound.GetVoiceMsg();
-                    break;
             }
         }
 
-        public void GetVoiceMsg()
+        private void DisplayMessages(List<string[]> list)
         {
-            try
+            foreach (string[] s in list) //перекидывает данные из листа в блоки
             {
-                byte[] length = new byte[4];
-                int bytesRead = MainWindow.StreamVoice.Read(length, 0, 4);
-                int fileLength = BitConverter.ToInt32(length, 0);
-
-                int bufferSize = 1024;
-                int allBytesRead = 0;
-                int bytesLeft = fileLength;
-                byte[] data = new byte[fileLength];
-
-                while (bytesLeft > 0)
+                Dispatcher.BeginInvoke(new ThreadStart(delegate
                 {
-                    int PacketSize = (bytesLeft > bufferSize) ? bufferSize : bytesLeft;
-
-                    bytesRead = MainWindow.StreamVoice.Read(data, allBytesRead, PacketSize);
-                    allBytesRead += bytesRead;
-                    bytesLeft -= bytesRead;
-                }
-                File.WriteAllBytes($@"C:\Users\{Environment.UserName}\Messenger\ClientSoundMes.wav", data);
-            }
-            catch
-            {
-                MessageBox.Show("Не удалось принять голосовое сообщение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    TextBlock newBlock = new TextBlock();
+                    newBlock.Text = s[0] + ":  " + s[1];
+                    lb.Children.Add(newBlock);
+                }));
             }
         }
 
-        /// <summary>
-        /// отправляем сообщение
-        /// </summary>
-        private void TxtPost_Click(object sender, RoutedEventArgs e) 
+        public async void UpdateTableAsync()
         {
-            if (UserTxt.Text.Trim() != string.Empty) //проверка на пустую строку
-            {
-                server.Send("1", user.Login, UserTxt.Text);
-                UserTxt.Text = string.Empty;
-                ScrollDown();
-            }
-        }
+            await Task.Run(() => UpdateTable());
+        }        
 
         /// <summary>
         /// опускаем чат вниз
@@ -206,6 +109,52 @@ namespace Messenger
         {
             if (lb.Children.Count != 0)
                 scroll.ScrollToEnd();
+        }
+
+        /// <summary>
+        /// метод останавливает запись и отправляет сообщения всем клиентам
+        /// </summary>
+        void OnStopRecording(object sendes, EventArgs e)
+        {
+            try
+            {
+                waveSource.StopRecording();
+                waveFile.Dispose();
+                myTimer.Stop();
+
+                sound.SendVoiceMsgToServer();
+                VoiceWarning.Visibility = Visibility.Hidden;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// запись звука
+        /// </summary>
+        static void WaveSource_DataAvailable(object sender, WaveInEventArgs e)
+        {
+            waveFile.Write(e.Buffer, 0, e.BytesRecorded);
+        }
+
+        private void HideBtn(object sender, EventArgs e)
+        {
+            Stop.Visibility = Visibility.Hidden;
+        }
+
+        /// <summary>
+        /// отправляем сообщение
+        /// </summary>
+        private void TxtPost_Click(object sender, RoutedEventArgs e)
+        {
+            if (UserTxt.Text.Trim() != string.Empty) //проверка на пустую строку
+            {
+                server.Send("1", user.Login, UserTxt.Text);
+                UserTxt.Text = string.Empty;
+                ScrollDown();
+            }
         }
 
         private void UserTxt_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр отправляет сообщение
@@ -269,45 +218,12 @@ namespace Messenger
                 MessageBox.Show("Не удалось найти путь к файлу", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             
-        }     
-       
-        /// <summary>
-        /// метод останавливает запись и отправляет сообщения всем клиентам
-        /// </summary>
-        void OnStopRecording(object sendes,EventArgs e)
-        {
-            try
-            {
-                waveSource.StopRecording();
-                waveFile.Dispose();
-                myTimer.Stop();
-
-                sound.SendSoundToServer();
-                VoiceWarning.Visibility = Visibility.Hidden;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }            
-        }
-                    
-        /// <summary>
-        /// запись звука
-        /// </summary>
-        static void WaveSource_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            waveFile.Write(e.Buffer, 0, e.BytesRecorded);
-        }
+        }   
 
         private void Stop_Click(object sender, RoutedEventArgs e) //пауза при воспроизведении аудио
         {
             player.Stop();
             player.Dispose();
-        }
-
-        private void HideBtn(object sender, EventArgs e)
-        {
-            Stop.Visibility = Visibility.Hidden;
         }
     }
 }

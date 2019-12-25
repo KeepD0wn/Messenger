@@ -1,18 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Data.SqlClient;
 using System.Reflection;
 using System.Net.Sockets;
 using System.IO;
@@ -62,23 +50,6 @@ namespace Messenger
             streamVoice = clientVoice.GetStream();
         }
 
-        /// <summary>
-        /// кнопка ввода
-        /// </summary>
-        private void Button_Enter(object sender, RoutedEventArgs e)
-        {
-            try
-            {                
-                //проверяем логин и пароль через бд на сервере
-                string[] words = server.GetConfirmLine(SendPack);
-                CompareData(words);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }       
-        }
-
         private void CompareData(string [] words)
         {
             if (words[1] == "confirmed")
@@ -103,7 +74,7 @@ namespace Messenger
 
         public void SendPack()
         {
-            server.Send("2", Logintb.Text, Passwtb.Text);
+            server.Send("2", Logintb.Text, Passwtb.Text); //отправляет на сервер данные для входа в аккаунт для проверки логина и пароля
         }
         
         public void Exep()
@@ -112,7 +83,24 @@ namespace Messenger
             Logintb.Text = string.Empty;
             Passwtb.Text = string.Empty;
         }
-       
+
+        /// <summary>
+        /// кнопка ввода
+        /// </summary>
+        private void Button_Enter(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //проверяем логин и пароль через бд на сервере
+                string[] words = server.GetServerAnswer(SendPack);
+                CompareData(words);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         /// <summary>
         /// открывает окно регистрации
         /// </summary>

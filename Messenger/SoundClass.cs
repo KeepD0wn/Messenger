@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Windows;
 
@@ -10,7 +6,7 @@ namespace Messenger
 {
     class SoundClass
     {
-        public void SendSoundToServer()
+        public void SendVoiceMsgToServer()
         {
             byte[] package = GetVoiceFile();
 
@@ -29,28 +25,31 @@ namespace Messenger
             }
         }
 
-        public void GetVoiceMsg()
+        public void WriteVoiceMsgFromServer()
         {
             try
             {
-                byte[] length = new byte[4];
-                int bytesRead = MainWindow.StreamVoice.Read(length, 0, 4);
-                int fileLength = BitConverter.ToInt32(length, 0);
-
-                int bufferSize = 1024;
-                int allBytesRead = 0;
-                int bytesLeft = fileLength;
-                byte[] data = new byte[fileLength];
-
-                while (bytesLeft > 0)
+                while (true)
                 {
-                    int PacketSize = (bytesLeft > bufferSize) ? bufferSize : bytesLeft;
+                    byte[] length = new byte[4];
+                    int bytesRead = MainWindow.StreamVoice.Read(length, 0, 4); //ждёт голосвого
+                    int fileLength = BitConverter.ToInt32(length, 0);
 
-                    bytesRead = MainWindow.StreamVoice.Read(data, allBytesRead, PacketSize);
-                    allBytesRead += bytesRead;
-                    bytesLeft -= bytesRead;
-                }
-                File.WriteAllBytes($@"C:\Users\{Environment.UserName}\Messenger\ClientSoundMes.wav", data);
+                    int bufferSize = 1024;
+                    int allBytesRead = 0;
+                    int bytesLeft = fileLength;
+                    byte[] data = new byte[fileLength];
+
+                    while (bytesLeft > 0)
+                    {
+                        int PacketSize = (bytesLeft > bufferSize) ? bufferSize : bytesLeft;
+
+                        bytesRead = MainWindow.StreamVoice.Read(data, allBytesRead, PacketSize);
+                        allBytesRead += bytesRead;
+                        bytesLeft -= bytesRead;
+                    }
+                    File.WriteAllBytes($@"C:\Users\{Environment.UserName}\Messenger\ClientSoundMes.wav", data);
+                }                
             }
             catch
             {
@@ -58,7 +57,7 @@ namespace Messenger
             }
         }
 
-        private static byte[] GetVoiceFile()
+        private byte[] GetVoiceFile()
         {
             byte[] file = File.ReadAllBytes($@"C:\Users\{Environment.UserName}\Messenger\SoundMessage.wav");
             byte[] fileLength = BitConverter.GetBytes(file.Length); //4 байта

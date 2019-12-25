@@ -92,6 +92,7 @@
     <Compile Include="Registr.xaml.cs">
       <DependentUpon>Registr.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Serializator.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="SoundClass.cs" />
     <Compile Include="User.cs" />

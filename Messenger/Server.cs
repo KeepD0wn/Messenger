@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Messenger
 {
@@ -20,7 +17,20 @@ namespace Messenger
             MainWindow.Stream.Write(buffer, 0, buffer.Length);
         }
 
-        public byte[] GetServerAnswer()
+        public string[] GetServerAnswer()
+        {
+            byte[] IncomingMessage = GetByteServerAnswer();
+            return DecodeServerAnswer(IncomingMessage);
+        }
+
+        public string[] GetServerAnswer(SendPackage sendPackage)
+        {
+            sendPackage();
+            byte[] IncomingMessage = GetByteServerAnswer();
+            return DecodeServerAnswer(IncomingMessage);
+        }
+
+        private byte[] GetByteServerAnswer()
         {
             byte[] IncomingMessage = new byte[256];
             do
@@ -31,24 +41,11 @@ namespace Messenger
             return IncomingMessage;
         }
 
-        public string[] DecodeServerAnswer(byte[] IncomingMessage)
+        private string[] DecodeServerAnswer(byte[] IncomingMessage)
         {
             string msgWrite = Encoding.UTF8.GetString(IncomingMessage).TrimEnd('\0');
             string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries); //разделяем пришедшую команду
             return words;
-        }
-
-        public string[] GetConfirmLine()
-        {
-            byte[] IncomingMessage = GetServerAnswer();
-            return DecodeServerAnswer(IncomingMessage);
-        }
-
-        public string[] GetConfirmLine(SendPackage sendPackage)
-        {
-            sendPackage();
-            byte[] IncomingMessage = GetServerAnswer();
-            return DecodeServerAnswer(IncomingMessage);
         }
     }
 }

@@ -1,18 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Data.SqlClient;
-using System.Net.Sockets;
 
 
 namespace Messenger
@@ -38,7 +26,7 @@ namespace Messenger
             {
                 if (RLog.Text != "" && RPas.Text != "")
                 {
-                    string[] words = server.GetConfirmLine(SendPack);
+                    string[] words = server.GetServerAnswer(SendPack);
                     CompareData(words); //проверка нет ли уже такого юзера
                 }
                 else
@@ -71,7 +59,7 @@ namespace Messenger
         
         public void SendPack()
         {
-            server.Send("0", RLog.Text, RPas.Text);
+            server.Send("0", RLog.Text, RPas.Text); //отправляет на сервер запрос на регистрацию юзера
         }
 
         private void Log_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле логина приравнивается к кнопке ввода
