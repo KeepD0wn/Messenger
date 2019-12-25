@@ -88,9 +88,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="PictureClass.cs" />
     <Compile Include="Registr.xaml.cs">
       <DependentUpon>Registr.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Server.cs" />
+    <Compile Include="SoundClass.cs" />
     <Compile Include="User.cs" />
     <Page Include="ChatWin.xaml">
       <SubType>Designer</SubType>

@@ -26,6 +26,7 @@ namespace Messenger
     {               
         static NetworkStream stream;
         static NetworkStream streamVoice;
+        Server server = new Server();
 
         readonly string ip = "127.0.0.1"; //85.192.34.44
         readonly int port = 12000;
@@ -67,9 +68,9 @@ namespace Messenger
         private void Button_Enter(object sender, RoutedEventArgs e)
         {
             try
-            {
+            {                
                 //проверяем логин и пароль через бд на сервере
-                string[] words = GetConfirmLine();
+                string[] words = server.GetConfirmLine(SendPack);
                 CompareData(words);
             }
             catch (Exception ex)
@@ -100,34 +101,11 @@ namespace Messenger
             }
         }
 
-        private string[] GetConfirmLine()
+        public void SendPack()
         {
-            byte[] IncomingMessage = GetServerAnswer();
-            return DecodeServerAnswer(IncomingMessage);
+            server.Send("2", Logintb.Text, Passwtb.Text);
         }
-
-        private static string[] DecodeServerAnswer(byte[] IncomingMessage)
-        {
-            string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0');
-            string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
-            return words;
-        }
-
-        private byte[] GetServerAnswer()
-        {
-            string message = $"2:&#:{Logintb.Text}:&#:{Passwtb.Text}"; //запрос подтверждения данных
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
-            Stream.Write(buffer, 0, buffer.Length);
-
-            byte[] IncomingMessage = new byte[128];  //ответ от сервера сходятся ли логин и пароль по БД
-            do
-            {
-                int bytes = Stream.Read(IncomingMessage, 0, IncomingMessage.Length);
-            }
-            while (Stream.DataAvailable); // пока данные есть в потоке
-            return IncomingMessage;
-        }
-
+        
         public void Exep()
         {
             MessageBox.Show("Неправильный логин или пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);

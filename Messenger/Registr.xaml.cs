@@ -21,7 +21,9 @@ namespace Messenger
     /// Логика взаимодействия для Registr.xaml
     /// </summary>
     public partial class Registr : Window
-    {       
+    {
+        Server server = new Server();
+
         public Registr()
         {
             InitializeComponent();
@@ -36,7 +38,7 @@ namespace Messenger
             {
                 if (RLog.Text != "" && RPas.Text != "")
                 {
-                    string[] words = GetConfirmLine();
+                    string[] words = server.GetConfirmLine(SendPack);
                     CompareData(words); //проверка нет ли уже такого юзера
                 }
                 else
@@ -66,33 +68,10 @@ namespace Messenger
                 RPas.Text = string.Empty;
             }
         }
-
-        private string[] GetConfirmLine()
+        
+        public void SendPack()
         {
-            byte[] IncomingMessage = GetServerAnswer();
-            return DecodeServerAnswer(IncomingMessage);
-        }
-
-        private static string[] DecodeServerAnswer(byte[] IncomingMessage)
-        {
-            string msgWrite = Encoding.ASCII.GetString(IncomingMessage).TrimEnd('\0'); //декодируем и разделяем на команды
-            string[] words = msgWrite.Split(new char[] { ':', '&', '#', ':' }, StringSplitOptions.RemoveEmptyEntries);
-            return words;
-        }
-
-        private byte[] GetServerAnswer()
-        {
-            string message = $"0:&#:{RLog.Text}:&#:{RPas.Text}"; //говорим что хотим добавить
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
-            MainWindow.Stream.Write(buffer, 0, buffer.Length);
-
-            byte[] IncomingMessage = new byte[128]; //ответ сервера всё ок или нет (есть такой логин или нет)
-            do
-            {
-                int bytes = MainWindow.Stream.Read(IncomingMessage, 0, IncomingMessage.Length);
-            }
-            while (MainWindow.Stream.DataAvailable); // пока данные есть в потоке
-            return IncomingMessage;
+            server.Send("0", RLog.Text, RPas.Text);
         }
 
         private void Log_KeyDown(object sender, KeyEventArgs e) //нажатие на энтр в поле логина приравнивается к кнопке ввода
