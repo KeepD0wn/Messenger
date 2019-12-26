@@ -21,7 +21,7 @@ namespace Messenger
         SoundClass sound = new SoundClass();
         Serializator serializator = new Serializator();
 
-        static WaveFileWriter waveFile; //TODO: перенести это в класс саунда
+        static WaveFileWriter waveFile; //TODO: перенести это в класс саунда 
         WaveInEvent waveSource = new WaveInEvent();
         private Timer myTimer = new Timer();
         static SoundPlayer player = new SoundPlayer();
@@ -60,7 +60,7 @@ namespace Messenger
         /// <summary>
         /// постоянно прослушивает сервер на новые сообщения от других юзеров
         /// </summary>
-        public void GetMessage()
+        private void GetMessage()
         {
             while (true)
             {
@@ -97,7 +97,7 @@ namespace Messenger
             }
         }
 
-        public async void UpdateTableAsync()
+        private async void UpdateTableAsync()
         {
             await Task.Run(() => UpdateTable());
         }        
@@ -105,7 +105,7 @@ namespace Messenger
         /// <summary>
         /// опускаем чат вниз
         /// </summary>
-        public void ScrollDown() //мотаем вниз
+        private void ScrollDown() //мотаем вниз
         {
             if (lb.Children.Count != 0)
                 scroll.ScrollToEnd();
@@ -114,7 +114,7 @@ namespace Messenger
         /// <summary>
         /// метод останавливает запись и отправляет сообщения всем клиентам
         /// </summary>
-        void OnStopRecording(object sendes, EventArgs e)
+        private void OnStopRecording(object sendes, EventArgs e)
         {
             try
             {
@@ -134,7 +134,7 @@ namespace Messenger
         /// <summary>
         /// запись звука
         /// </summary>
-        static void WaveSource_DataAvailable(object sender, WaveInEventArgs e)
+        private void WaveSource_DataAvailable(object sender, WaveInEventArgs e)
         {
             waveFile.Write(e.Buffer, 0, e.BytesRecorded);
         }

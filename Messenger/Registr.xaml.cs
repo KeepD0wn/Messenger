@@ -56,8 +56,8 @@ namespace Messenger
                 RPas.Text = string.Empty;
             }
         }
-        
-        public void SendPack()
+
+        private void SendPack()
         {
             server.Send("0", RLog.Text, RPas.Text); //отправляет на сервер запрос на регистрацию юзера
         }

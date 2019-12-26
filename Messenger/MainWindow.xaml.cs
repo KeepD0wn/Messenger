@@ -56,9 +56,9 @@ namespace Messenger
             {
                 User user = new User
                         (
-                          Convert.ToInt32(words[3]),
-                          words[4].ToString(),
-                          words[5].ToString()
+                          Convert.ToInt32(words[2]),
+                          words[3].ToString(),
+                          words[4].ToString()
                         );
 
                 ChatWin cw = new ChatWin(user);
@@ -72,12 +72,12 @@ namespace Messenger
             }
         }
 
-        public void SendPack()
+        private void SendPack()
         {
             server.Send("2", Logintb.Text, Passwtb.Text); //отправляет на сервер данные для входа в аккаунт для проверки логина и пароля
         }
-        
-        public void Exep()
+
+        private void Exep()
         {
             MessageBox.Show("Неправильный логин или пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             Logintb.Text = string.Empty;

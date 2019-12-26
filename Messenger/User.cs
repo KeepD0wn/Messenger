@@ -10,7 +10,7 @@ namespace Messenger
     {
         public int Id { get;private set; }
         public string Login { get;private set; }
-        public string Password { get;private set; }
+        private string Password { get; }
         
         public User(int id,string login,string password)
         {
@@ -18,6 +18,5 @@ namespace Messenger
             Login = login;
             Password = password;
         }
-
     }
 }
